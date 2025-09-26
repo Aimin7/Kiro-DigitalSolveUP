@@ -156,7 +156,20 @@ kiro로 사회현안 해결하기/
 
 ## 📄 라이선스
 
-이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+```
+MIT License - 자유롭게 사용, 수정, 배포 가능
+- ✅ 상업적 사용 허용
+- ✅ 수정 허용  
+- ✅ 배포 허용
+- ✅ 개인 사용 허용
+- ⚠️ 저작권 표시 필수
+```
+
+자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
 ## 📞 문의
 

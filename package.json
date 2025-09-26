@@ -1,12 +1,34 @@
 {
-  "name": "flood-info-server",
+  "name": "kiro-flood-info-system",
   "version": "1.0.0",
-  "description": "Simple Express server for flood info app",
+  "description": "실시간 홍수 정보 제공 시스템 - Real-time flood information system",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+    "flood",
+    "disaster", 
+    "real-time",
+    "korea",
+    "public-safety",
+    "emergency",
+    "weather",
+    "naver-maps",
+    "aws"
+  ],
+  "author": "Aimin7",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Aimin7/kiro-flood-info-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Aimin7/kiro-flood-info-system/issues"
+  },
+  "homepage": "https://github.com/Aimin7/kiro-flood-info-system#readme",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5"
