@@ -138,7 +138,7 @@ aws s3 sync dist/ s3://YOUR_BUCKET_NAME --delete
 ## 📁 프로젝트 구조
 
 ```
-kiro로 사회현안 해결하기/
+Kiro와 함께하는 국가위기 및 사회현안 해결/
 ├── frontend/                 # React 프론트엔드
 │   ├── src/
 │   │   ├── services/        # API 서비스
