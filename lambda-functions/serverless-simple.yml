@@ -1,0 +1,99 @@
+service: flood-info-api
+
+frameworkVersion: '3'
+
+package:
+  exclude:
+    - node_modules/**
+    - tests/**
+    - docs/**
+    - .git/**
+    - '*.md'
+    - package-lock.json
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-northeast-2
+  stage: ${opt:stage, 'dev'}
+  memorySize: 256
+  timeout: 30
+  environment:
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    FLOOD_INFO_TABLE: ${self:service}-${self:provider.stage}-flood-info
+    API_SOURCE_TABLE: ${self:service}-${self:provider.stage}-api-source
+    NAVER_CLIENT_ID: ${env:NAVER_CLIENT_ID}
+    NAVER_CLIENT_SECRET: ${env:NAVER_CLIENT_SECRET}
+    ALLOWED_ORIGINS: ${env:ALLOWED_ORIGINS, '*'}
+    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.FLOOD_INFO_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.FLOOD_INFO_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.API_SOURCE_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.API_SOURCE_TABLE}/index/*"
+
+functions:
+  # 헬스 체크
+  healthCheck:
+    handler: src/handlers/simple.health
+    events:
+      - http:
+          path: /api/health
+          method: get
+          cors: true
+
+  # 침수 데이터 조회
+  getFloodData:
+    handler: src/handlers/simple.getFloodData
+    events:
+      - http:
+          path: /api/flood-data
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    # FloodInfo 테이블
+    FloodInfoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.FLOOD_INFO_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+
+    # APISource 테이블
+    APISourceTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.API_SOURCE_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: sourceId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: sourceId
+            KeyType: HASH
+
+plugins:
+  - serverless-offline

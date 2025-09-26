@@ -1,0 +1,610 @@
+service: flood-info-backend
+
+frameworkVersion: '3'
+
+package:
+  exclude:
+    - tests/**
+    - docs/**
+    - .git/**
+    - .gitignore
+    - README.md
+    - package-lock.json
+    - node_modules/aws-sdk/**
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-northeast-2
+  stage: ${opt:stage, 'dev'}
+  memorySize: 512
+  timeout: 30
+  versionFunctions: false
+  tracing:
+    lambda: true
+    apiGateway: true
+  logs:
+    restApi: false
+  environment:
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    # DynamoDB Tables
+    FLOOD_INFO_TABLE: ${self:service}-${self:provider.stage}-flood-info
+    API_SOURCE_TABLE: ${self:service}-${self:provider.stage}-api-source
+    # API Keys
+    NAVER_CLIENT_ID: ${env:NAVER_CLIENT_ID}
+    NAVER_CLIENT_SECRET: ${env:NAVER_CLIENT_SECRET}
+    # Han River API
+    HANRIVER_BASE_URL: http://211.188.52.85:9191
+    HANRIVER_WATERLEVEL_ENDPOINT: /waterlevelinfo/info.json
+    HANRIVER_REALTIME_ENDPOINT: /getWaterLevel1D/list/1D/1018683/20230701/20230930.json
+    HANRIVER_FORECAST_ENDPOINT: /fldfct/list/20230715.json
+    # WebSocket
+    WEBSOCKET_API_ENDPOINT: ${self:custom.websocketApiEndpoint.${self:provider.stage}}
+    # Security
+    ALLOWED_ORIGINS: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+    REQUIRE_API_KEY: ${env:REQUIRE_API_KEY, 'false'}
+    MAX_BODY_SIZE: ${env:MAX_BODY_SIZE, '1048576'}
+    # Monitoring
+    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+  iam:
+    role:
+      statements:
+        # DynamoDB permissions
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchGetItem
+            - dynamodb:BatchWriteItem
+          Resource:
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.FLOOD_INFO_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.FLOOD_INFO_TABLE}/index/*"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.API_SOURCE_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.API_SOURCE_TABLE}/index/*"
+        # WebSocket permissions
+        - Effect: Allow
+          Action:
+            - execute-api:ManageConnections
+          Resource:
+            - "arn:aws:execute-api:${self:provider.region}:*:*"
+        # CloudWatch Logs permissions
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource:
+            - "arn:aws:logs:${self:provider.region}:*:*"
+        # X-Ray permissions
+        - Effect: Allow
+          Action:
+            - xray:PutTraceSegments
+            - xray:PutTelemetryRecords
+          Resource:
+            - "*"
+
+functions:
+  # ===== HTTP API Functions =====
+  
+  # 침수 데이터 조회
+  getFloodData:
+    handler: src/handlers/floodHandler.getFloodData
+    description: "Get flood data with filtering options"
+    events:
+      - http:
+          path: /api/flood-data
+          method: get
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: true
+
+  # 한강홍수통제소 원본 데이터 조회
+  getHanRiverData:
+    handler: src/handlers/floodHandler.getHanRiverData
+    description: "Get Han River flood control office data"
+    events:
+      - http:
+          path: /api/flood-data/hanriver
+          method: get
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 위치 기반 침수 데이터 조회
+  getFloodDataByLocation:
+    handler: src/handlers/locationHandler.getFloodDataByLocation
+    description: "Get flood data by location (lat, lng, radius)"
+    events:
+      - http:
+          path: /api/flood-data/location
+          method: get
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 다중 소스 데이터 조회
+  getMultiSourceData:
+    handler: src/handlers/multiSourceHandler.getMultiSourceData
+    description: "Get multi-source data for specific location"
+    events:
+      - http:
+          path: /api/flood-data/multi-source/{locationId}
+          method: get
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 다중 소스 데이터 목록 조회
+  getMultiSourceDataList:
+    handler: src/handlers/multiSourceHandler.getMultiSourceDataList
+    description: "Get list of multi-source data"
+    events:
+      - http:
+          path: /api/flood-data/multi-source
+          method: get
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 데이터 갱신
+  refreshFloodData:
+    handler: src/handlers/refreshHandler.refreshFloodData
+    description: "Refresh flood data from external APIs"
+    timeout: 60
+    memorySize: 1024
+    events:
+      - http:
+          path: /api/flood-data/refresh
+          method: post
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 지역별 데이터 갱신
+  refreshRegionData:
+    handler: src/handlers/refreshHandler.refreshRegionData
+    description: "Refresh flood data for specific region"
+    timeout: 60
+    memorySize: 1024
+    events:
+      - http:
+          path: /api/flood-data/refresh/{region}
+          method: post
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 데이터 상태 조회
+  getDataStatus:
+    handler: src/handlers/refreshHandler.getDataStatus
+    description: "Get data status and statistics"
+    events:
+      - http:
+          path: /api/flood-data/status
+          method: get
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 오래된 데이터 정리
+  cleanupOldData:
+    handler: src/handlers/refreshHandler.cleanupOldData
+    description: "Cleanup old flood data"
+    timeout: 60
+    events:
+      - http:
+          path: /api/flood-data/cleanup
+          method: post
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 안전 경로 안내
+  getSafeRoute:
+    handler: src/handlers/naverHandler.getSafeRoute
+    description: "Get safe route avoiding flood areas"
+    events:
+      - http:
+          path: /api/directions/safe-route
+          method: get
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 경로 근접성 검사
+  checkProximity:
+    handler: src/handlers/proximityHandler.checkProximity
+    description: "Check route proximity to flood areas"
+    events:
+      - http:
+          path: /api/directions/check-proximity
+          method: post
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 대체 경로 계산
+  getAlternativeRoute:
+    handler: src/handlers/proximityHandler.getAlternativeRoute
+    description: "Get alternative route avoiding flood areas"
+    events:
+      - http:
+          path: /api/directions/alternative-route
+          method: post
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 주소-좌표 변환
+  geocodeAddress:
+    handler: src/handlers/naverHandler.geocodeAddress
+    description: "Convert address to coordinates"
+    events:
+      - http:
+          path: /api/geocoding/address
+          method: post
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # 좌표-주소 변환
+  reverseGeocode:
+    handler: src/handlers/naverHandler.reverseGeocode
+    description: "Convert coordinates to address"
+    events:
+      - http:
+          path: /api/geocoding/reverse
+          method: post
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+  # ===== WebSocket Functions =====
+  
+  # WebSocket 연결
+  websocketConnect:
+    handler: src/utils/websocket.connectHandler
+    description: "Handle WebSocket connections"
+    events:
+      - websocket:
+          route: $connect
+
+  # WebSocket 연결 해제
+  websocketDisconnect:
+    handler: src/utils/websocket.disconnectHandler
+    description: "Handle WebSocket disconnections"
+    events:
+      - websocket:
+          route: $disconnect
+
+  # WebSocket 메시지 처리
+  websocketMessage:
+    handler: src/utils/websocket.messageHandler
+    description: "Handle WebSocket messages"
+    events:
+      - websocket:
+          route: $default
+
+  # ===== Scheduled Functions =====
+  
+  # 정기 데이터 갱신 (5분마다)
+  scheduledRefresh:
+    handler: src/handlers/refreshHandler.scheduledRefresh
+    description: "Scheduled flood data refresh"
+    timeout: 300
+    memorySize: 1024
+    events:
+      - schedule:
+          rate: rate(5 minutes)
+          enabled: ${env:ENABLE_SCHEDULED_REFRESH, 'true'}
+
+  # 일일 데이터 정리 (매일 자정)
+  dailyCleanup:
+    handler: src/handlers/refreshHandler.cleanupOldData
+    description: "Daily cleanup of old data"
+    timeout: 300
+    events:
+      - schedule:
+          rate: cron(0 0 * * ? *)
+          enabled: true
+
+  # ===== Monitoring Functions =====
+  
+  # 헬스 체크
+  healthCheck:
+    handler: src/handlers/healthHandler.healthCheck
+    description: "Health check endpoint"
+    events:
+      - http:
+          path: /api/health
+          method: get
+          cors:
+            origin: '*'
+            allowCredentials: false
+
+  # 시스템 상태 조회
+  getSystemStatus:
+    handler: src/handlers/healthHandler.getSystemStatus
+    description: "Get detailed system status"
+    events:
+      - http:
+          path: /api/status
+          method: get
+          cors:
+            origin: ${env:ALLOWED_ORIGINS, 'http://localhost:3000,http://localhost:5173'}
+            allowCredentials: true
+
+resources:
+  Resources:
+    # ===== DynamoDB Tables =====
+    
+    # FloodInfo 테이블
+    FloodInfoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.FLOOD_INFO_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: S
+          - AttributeName: locationId
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+          - AttributeName: severity
+            AttributeType: S
+          - AttributeName: alertType
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: LocationIndex
+            KeySchema:
+              - AttributeName: locationId
+                KeyType: HASH
+              - AttributeName: timestamp
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: StatusIndex
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+              - AttributeName: timestamp
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: SeverityIndex
+            KeySchema:
+              - AttributeName: severity
+                KeyType: HASH
+              - AttributeName: timestamp
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: AlertTypeIndex
+            KeySchema:
+              - AttributeName: alertType
+                KeyType: HASH
+              - AttributeName: timestamp
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        Tags:
+          - Key: Service
+            Value: ${self:service}
+          - Key: Stage
+            Value: ${self:provider.stage}
+          - Key: Purpose
+            Value: FloodInfo
+
+    # APISource 테이블
+    APISourceTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.API_SOURCE_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: sourceId
+            AttributeType: S
+          - AttributeName: apiType
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+        KeySchema:
+          - AttributeName: sourceId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: APITypeIndex
+            KeySchema:
+              - AttributeName: apiType
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: StatusIndex
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        Tags:
+          - Key: Service
+            Value: ${self:service}
+          - Key: Stage
+            Value: ${self:provider.stage}
+          - Key: Purpose
+            Value: APISource
+
+    # ===== CloudWatch Alarms =====
+    
+    # Lambda 오류율 알람
+    LambdaErrorAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${self:provider.stage}-lambda-errors
+        AlarmDescription: Lambda function error rate is too high
+        MetricName: Errors
+        Namespace: AWS/Lambda
+        Statistic: Sum
+        Period: 300
+        EvaluationPeriods: 2
+        Threshold: 10
+        ComparisonOperator: GreaterThanThreshold
+        Dimensions:
+          - Name: FunctionName
+            Value: ${self:service}-${self:provider.stage}-getFloodData
+        TreatMissingData: notBreaching
+
+    # DynamoDB 스로틀링 알람
+    DynamoDBThrottleAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${self:provider.stage}-dynamodb-throttles
+        AlarmDescription: DynamoDB throttling detected
+        MetricName: ThrottledRequests
+        Namespace: AWS/DynamoDB
+        Statistic: Sum
+        Period: 300
+        EvaluationPeriods: 2
+        Threshold: 5
+        ComparisonOperator: GreaterThanThreshold
+        Dimensions:
+          - Name: TableName
+            Value: ${self:provider.environment.FLOOD_INFO_TABLE}
+        TreatMissingData: notBreaching
+
+    # API Gateway 4xx 오류 알람
+    APIGateway4xxAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmName: ${self:service}-${self:provider.stage}-api-4xx-errors
+        AlarmDescription: API Gateway 4xx error rate is too high
+        MetricName: 4XXError
+        Namespace: AWS/ApiGateway
+        Statistic: Sum
+        Period: 300
+        EvaluationPeriods: 2
+        Threshold: 20
+        ComparisonOperator: GreaterThanThreshold
+        TreatMissingData: notBreaching
+
+    # ===== CloudWatch Log Groups =====
+    
+    # API Gateway 액세스 로그 그룹
+    ApiGatewayLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/apigateway/${self:service}-${self:provider.stage}
+        RetentionInDays: 14
+
+    # ===== S3 Bucket for Frontend =====
+    
+    FrontendBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${self:provider.stage}-frontend
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: error.html
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - "*"
+              AllowedMethods:
+                - GET
+                - HEAD
+              AllowedOrigins:
+                - "*"
+              MaxAge: 3600
+
+    # S3 버킷 정책
+    FrontendBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref FrontendBucket
+        PolicyDocument:
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: "*"
+              Action: s3:GetObject
+              Resource: 
+                Fn::Sub: "${FrontendBucket}/*"
+
+    # CloudFront는 나중에 추가
+
+  # ===== Outputs =====
+  Outputs:
+    FloodInfoTableName:
+      Value: 
+        Ref: FloodInfoTable
+      Export:
+        Name: ${self:service}-${self:provider.stage}-flood-info-table
+
+    APISourceTableName:
+      Value: 
+        Ref: APISourceTable
+      Export:
+        Name: ${self:service}-${self:provider.stage}-api-source-table
+
+    FrontendBucketName:
+      Value: 
+        Ref: FrontendBucket
+      Export:
+        Name: ${self:service}-${self:provider.stage}-frontend-bucket
+
+plugins:
+  - serverless-offline
+
+custom:
+  # Serverless Offline 설정
+  serverless-offline:
+    httpPort: 3001
+    websocketPort: 3002
+    host: 0.0.0.0
+    stage: ${self:provider.stage}
+
+  # Serverless Offline 설정만 유지
+
+  # WebSocket API 엔드포인트
+  websocketApiEndpoint:
+    dev: wss://localhost:3002
+    prod: !Sub "wss://${WebsocketsApi}.execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}"
+
+  # 환경별 설정
+  stages:
+    dev:
+      ENABLE_SCHEDULED_REFRESH: false
+      LOG_LEVEL: debug
+    prod:
+      ENABLE_SCHEDULED_REFRESH: true
+      LOG_LEVEL: info

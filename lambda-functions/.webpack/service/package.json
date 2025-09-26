@@ -1,0 +1,10 @@
+{
+  "name": "flood-info-backend",
+  "version": "1.0.0",
+  "description": "Packaged externals for flood-info-backend",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "aws-sdk": "^2.1691.0"
+  }
+}
