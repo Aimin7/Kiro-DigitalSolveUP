@@ -4,7 +4,11 @@
 
 ## 🏗️ 시스템 구성도
 
+### 전체 시스템 아키텍처
 ![KIRO 홍수 정보 시스템 구성도](docs/architecture-diagram.svg)
+
+### AWS 클라우드 아키텍처
+![AWS 아키텍처 다이어그램](docs/aws-architecture-diagram.svg)
 
 ## 🚀 주요 기능
 
