@@ -1,240 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="1400" height="900" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="700" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <style>
-      .aws-title { font: bold 20px Arial; fill: #232f3e; }
-      .aws-subtitle { font: bold 14px Arial; fill: #232f3e; }
-      .aws-text { font: 11px Arial; fill: #232f3e; }
-      .aws-small { font: 9px Arial; fill: #5a6c7d; }
-      .aws-white-text { font: 11px Arial; fill: white; }
-      .aws-orange { fill: #ff9900; stroke: #ff9900; }
-      .aws-blue { fill: #146eb4; stroke: #146eb4; }
-      .aws-green { fill: #7aa116; stroke: #7aa116; }
-      .aws-red { fill: #d13212; stroke: #d13212; }
-      .aws-purple { fill: #9d5025; stroke: #9d5025; }
-      .aws-gray { fill: #5a6c7d; stroke: #5a6c7d; }
-      .aws-light-gray { fill: #f2f3f3; stroke: #879196; stroke-width: 1; }
-      .aws-border { fill: none; stroke: #879196; stroke-width: 2; stroke-dasharray: 5,5; }
-      .aws-arrow { stroke: #232f3e; stroke-width: 2; fill: none; marker-end: url(#aws-arrowhead); }
-      .aws-data-flow { stroke: #ff9900; stroke-width: 3; fill: none; marker-end: url(#aws-orange-arrow); }
+      .aws-title { font: bold 18px Arial; fill: #232f3e; }
+      .aws-text { font: 12px Arial; fill: #232f3e; }
+      .aws-small { font: 10px Arial; fill: #5a6c7d; }
+      .aws-white { font: 11px Arial; fill: white; font-weight: bold; }
+      .aws-orange { fill: #ff9900; }
+      .aws-blue { fill: #146eb4; }
+      .aws-green { fill: #7aa116; }
+      .aws-red { fill: #d13212; }
+      .aws-purple { fill: #9d5025; }
+      .aws-border { fill: none; stroke: #879196; stroke-width: 2; stroke-dasharray: 8,4; }
+      .aws-solid { fill: none; stroke: #232f3e; stroke-width: 2; }
+      .arrow { stroke: #232f3e; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .data-flow { stroke: #ff9900; stroke-width: 3; fill: none; marker-end: url(#orange-arrow); }
     </style>
-    <marker id="aws-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#232f3e" />
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#232f3e" />
     </marker>
-    <marker id="aws-orange-arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#ff9900" />
+    <marker id="orange-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#ff9900" />
     </marker>
   </defs>
 
-  <!-- AWS Logo and Title -->
-  <rect x="0" y="0" width="1400" height="60" fill="#232f3e"/>
-  <text x="70" y="35" class="aws-title" fill="white">Amazon Web Services</text>
-  <text x="70" y="50" class="aws-text" fill="#ff9900">KIRO 홍수 정보 시스템 - 아키텍처 다이어그램</text>
+  <!-- AWS Header -->
+  <rect x="0" y="0" width="1200" height="50" fill="#232f3e"/>
+  <text x="20" y="30" class="aws-title" fill="white">Amazon Web Services - KIRO 홍수 정보 시스템</text>
 
-  <!-- Internet/Users Zone -->
-  <rect x="50" y="80" width="200" height="120" class="aws-light-gray" rx="10"/>
-  <text x="150" y="100" text-anchor="middle" class="aws-subtitle">인터넷 사용자</text>
-  
-  <!-- User Icon -->
-  <circle cx="120" cy="130" r="15" class="aws-blue"/>
-  <text x="120" y="135" text-anchor="middle" class="aws-white-text">👤</text>
-  <text x="120" y="155" text-anchor="middle" class="aws-text">웹 브라우저</text>
-  
-  <circle cx="180" cy="130" r="15" class="aws-blue"/>
-  <text x="180" y="135" text-anchor="middle" class="aws-white-text">📱</text>
-  <text x="180" y="155" text-anchor="middle" class="aws-text">모바일</text>
+  <!-- Internet Zone -->
+  <rect x="50" y="80" width="150" height="100" fill="#f2f3f3" stroke="#879196" rx="8"/>
+  <text x="125" y="105" text-anchor="middle" class="aws-text">인터넷 사용자</text>
+  <circle cx="125" cy="140" r="20" class="aws-blue"/>
+  <text x="125" y="147" text-anchor="middle" class="aws-white">Users</text>
 
-  <!-- AWS Cloud Border -->
-  <rect x="300" y="80" width="1050" height="750" class="aws-border" rx="15"/>
-  <text x="320" y="100" class="aws-subtitle" fill="#ff9900">AWS Cloud</text>
+  <!-- AWS Cloud -->
+  <rect x="250" y="60" width="900" height="580" class="aws-border" rx="15"/>
+  <text x="270" y="85" class="aws-text" fill="#ff9900">AWS Cloud</text>
 
-  <!-- Region Border -->
-  <rect x="320" y="120" width="1010" height="700" class="aws-light-gray" rx="10"/>
-  <text x="340" y="140" class="aws-text">Asia Pacific (Seoul) - ap-northeast-2</text>
+  <!-- Region -->
+  <rect x="280" y="100" width="840" height="520" fill="#fff" stroke="#bdc3c7" rx="10"/>
+  <text x="300" y="125" class="aws-small">Asia Pacific (Seoul) ap-northeast-2</text>
 
-  <!-- Availability Zone A -->
-  <rect x="340" y="160" width="480" height="320" fill="#fff2cc" stroke="#d6b656" stroke-width="2" rx="8"/>
-  <text x="360" y="180" class="aws-text" fill="#bf9000">가용 영역 A</text>
-
-  <!-- Availability Zone B -->
-  <rect x="840" y="160" width="480" height="320" fill="#fff2cc" stroke="#d6b656" stroke-width="2" rx="8"/>
-  <text x="860" y="180" class="aws-text" fill="#bf9000">가용 영역 B</text>
+  <!-- Availability Zone -->
+  <rect x="300" y="140" width="800" height="200" fill="#fff2cc" stroke="#d6b656" rx="8"/>
+  <text x="320" y="165" class="aws-small" fill="#bf9000">Availability Zone</text>
 
   <!-- CloudFront -->
-  <rect x="360" y="200" width="80" height="60" class="aws-orange" rx="5"/>
-  <text x="400" y="220" text-anchor="middle" class="aws-white-text">CloudFront</text>
-  <text x="400" y="235" text-anchor="middle" class="aws-white-text">CDN</text>
-  <text x="400" y="250" text-anchor="middle" class="aws-white-text">글로벌 배포</text>
+  <rect x="320" y="180" width="100" height="60" class="aws-orange" rx="5"/>
+  <text x="370" y="205" text-anchor="middle" class="aws-white">CloudFront</text>
+  <text x="370" y="220" text-anchor="middle" class="aws-white">CDN</text>
 
-  <!-- S3 Bucket -->
-  <rect x="480" y="200" width="80" height="60" class="aws-green" rx="5"/>
-  <text x="520" y="220" text-anchor="middle" class="aws-white-text">S3</text>
-  <text x="520" y="235" text-anchor="middle" class="aws-white-text">정적 웹사이트</text>
-  <text x="520" y="250" text-anchor="middle" class="aws-white-text">호스팅</text>
+  <!-- S3 -->
+  <rect x="450" y="180" width="100" height="60" class="aws-green" rx="5"/>
+  <text x="500" y="205" text-anchor="middle" class="aws-white">S3</text>
+  <text x="500" y="220" text-anchor="middle" class="aws-white">Static Web</text>
 
   <!-- API Gateway -->
-  <rect x="600" y="200" width="80" height="60" class="aws-purple" rx="5"/>
-  <text x="640" y="220" text-anchor="middle" class="aws-white-text">API</text>
-  <text x="640" y="235" text-anchor="middle" class="aws-white-text">Gateway</text>
-  <text x="640" y="250" text-anchor="middle" class="aws-white-text">REST API</text>
+  <rect x="580" y="180" width="100" height="60" class="aws-purple" rx="5"/>
+  <text x="630" y="205" text-anchor="middle" class="aws-white">API Gateway</text>
+  <text x="630" y="220" text-anchor="middle" class="aws-white">REST API</text>
 
-  <!-- Lambda Functions -->
-  <rect x="720" y="200" width="80" height="60" class="aws-orange" rx="5"/>
-  <text x="760" y="220" text-anchor="middle" class="aws-white-text">Lambda</text>
-  <text x="760" y="235" text-anchor="middle" class="aws-white-text">서버리스</text>
-  <text x="760" y="250" text-anchor="middle" class="aws-white-text">함수</text>
+  <!-- Lambda -->
+  <rect x="710" y="180" width="100" height="60" class="aws-orange" rx="5"/>
+  <text x="760" y="205" text-anchor="middle" class="aws-white">Lambda</text>
+  <text x="760" y="220" text-anchor="middle" class="aws-white">Functions</text>
 
   <!-- DynamoDB -->
-  <rect x="860" y="200" width="80" height="60" class="aws-blue" rx="5"/>
-  <text x="900" y="220" text-anchor="middle" class="aws-white-text">DynamoDB</text>
-  <text x="900" y="235" text-anchor="middle" class="aws-white-text">NoSQL</text>
-  <text x="900" y="250" text-anchor="middle" class="aws-white-text">데이터베이스</text>
+  <rect x="840" y="180" width="100" height="60" class="aws-blue" rx="5"/>
+  <text x="890" y="205" text-anchor="middle" class="aws-white">DynamoDB</text>
+  <text x="890" y="220" text-anchor="middle" class="aws-white">NoSQL DB</text>
 
   <!-- Lambda Functions Detail -->
-  <rect x="360" y="300" width="120" height="80" class="aws-light-gray" rx="5"/>
-  <text x="420" y="320" text-anchor="middle" class="aws-subtitle">Lambda 함수들</text>
-  <text x="370" y="340" class="aws-small">• 홍수 데이터 처리</text>
-  <text x="370" y="355" class="aws-small">• 실시간 업데이트</text>
-  <text x="370" y="370" class="aws-small">• 알림 서비스</text>
+  <rect x="320" y="260" width="200" height="60" fill="#ffeaa7" stroke="#fdcb6e" rx="5"/>
+  <text x="420" y="280" text-anchor="middle" class="aws-text">Lambda Functions</text>
+  <text x="330" y="300" class="aws-small">• 홍수 데이터 처리</text>
+  <text x="330" y="315" class="aws-small">• 실시간 알림</text>
 
   <!-- DynamoDB Tables -->
-  <rect x="500" y="300" width="120" height="80" class="aws-light-gray" rx="5"/>
-  <text x="560" y="320" text-anchor="middle" class="aws-subtitle">DynamoDB 테이블</text>
-  <text x="510" y="340" class="aws-small">• 홍수 정보 테이블</text>
-  <text x="510" y="355" class="aws-small">• API 소스 테이블</text>
-  <text x="510" y="370" class="aws-small">• 사용자 설정</text>
+  <rect x="540" y="260" width="200" height="60" fill="#a8e6cf" stroke="#81c784" rx="5"/>
+  <text x="640" y="280" text-anchor="middle" class="aws-text">DynamoDB Tables</text>
+  <text x="550" y="300" class="aws-small">• 홍수 정보 테이블</text>
+  <text x="550" y="315" class="aws-small">• API 소스 테이블</text>
 
-  <!-- CloudWatch -->
-  <rect x="640" y="300" width="80" height="60" class="aws-red" rx="5"/>
-  <text x="680" y="320" text-anchor="middle" class="aws-white-text">CloudWatch</text>
-  <text x="680" y="335" text-anchor="middle" class="aws-white-text">모니터링</text>
-  <text x="680" y="350" text-anchor="middle" class="aws-white-text">로그</text>
+  <!-- Monitoring -->
+  <rect x="760" y="260" width="160" height="60" fill="#ff7675" stroke="#e17055" rx="5"/>
+  <text x="840" y="280" text-anchor="middle" class="aws-text">CloudWatch</text>
+  <text x="770" y="300" class="aws-small">• 모니터링 & 로그</text>
+  <text x="770" y="315" class="aws-small">• 알람 & 메트릭</text>
 
-  <!-- IAM -->
-  <rect x="740" y="300" width="80" height="60" class="aws-red" rx="5"/>
-  <text x="780" y="320" text-anchor="middle" class="aws-white-text">IAM</text>
-  <text x="780" y="335" text-anchor="middle" class="aws-white-text">권한 관리</text>
-  <text x="780" y="350" text-anchor="middle" class="aws-white-text">보안</text>
+  <!-- External APIs -->
+  <rect x="300" y="380" width="800" height="120" fill="#e8f5e8" stroke="#4caf50" rx="10"/>
+  <text x="320" y="405" class="aws-text" fill="#2e7d32">External API Integration</text>
 
-  <!-- Route 53 -->
-  <rect x="860" y="300" width="80" height="60" class="aws-orange" rx="5"/>
-  <text x="900" y="320" text-anchor="middle" class="aws-white-text">Route 53</text>
-  <text x="900" y="335" text-anchor="middle" class="aws-white-text">DNS</text>
-  <text x="900" y="350" text-anchor="middle" class="aws-white-text">도메인</text>
+  <!-- Naver API -->
+  <rect x="340" y="420" width="150" height="60" class="aws-green" rx="5"/>
+  <text x="415" y="445" text-anchor="middle" class="aws-white">Naver Maps</text>
+  <text x="415" y="460" text-anchor="middle" class="aws-white">API</text>
 
-  <!-- VPC -->
-  <rect x="960" y="200" width="120" height="160" fill="#e1f5fe" stroke="#0277bd" stroke-width="2" rx="8"/>
-  <text x="1020" y="220" text-anchor="middle" class="aws-text" fill="#0277bd">VPC</text>
-  <text x="1020" y="235" text-anchor="middle" class="aws-small" fill="#0277bd">가상 프라이빗 클라우드</text>
+  <!-- Public Data API -->
+  <rect x="520" y="420" width="150" height="60" class="aws-blue" rx="5"/>
+  <text x="595" y="445" text-anchor="middle" class="aws-white">공공데이터</text>
+  <text x="595" y="460" text-anchor="middle" class="aws-white">API</text>
 
-  <!-- Security Groups -->
-  <rect x="980" y="250" width="80" height="40" class="aws-red" rx="3"/>
-  <text x="1020" y="270" text-anchor="middle" class="aws-white-text">Security</text>
-  <text x="1020" y="285" text-anchor="middle" class="aws-white-text">Groups</text>
+  <!-- Weather API -->
+  <rect x="700" y="420" width="150" height="60" class="aws-purple" rx="5"/>
+  <text x="775" y="445" text-anchor="middle" class="aws-white">기상청</text>
+  <text x="775" y="460" text-anchor="middle" class="aws-white">API</text>
 
-  <!-- NAT Gateway -->
-  <rect x="980" y="300" width="80" height="40" class="aws-purple" rx="3"/>
-  <text x="1020" y="320" text-anchor="middle" class="aws-white-text">NAT</text>
-  <text x="1020" y="335" text-anchor="middle" class="aws-white-text">Gateway</text>
-
-  <!-- External APIs Zone -->
-  <rect x="340" y="520" width="980" height="140" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2" rx="10"/>
-  <text x="360" y="540" class="aws-subtitle" fill="#7b1fa2">외부 API 연동</text>
-
-  <!-- Naver APIs -->
-  <rect x="380" y="560" width="200" height="80" class="aws-green" rx="5"/>
-  <text x="480" y="580" text-anchor="middle" class="aws-white-text">네이버 API</text>
-  <text x="400" y="600" class="aws-small" fill="white">• Maps API</text>
-  <text x="400" y="615" class="aws-small" fill="white">• Geocoding API</text>
-  <text x="400" y="630" class="aws-small" fill="white">• Directions API</text>
-
-  <!-- Public Data APIs -->
-  <rect x="600" y="560" width="200" height="80" class="aws-blue" rx="5"/>
-  <text x="700" y="580" text-anchor="middle" class="aws-white-text">공공데이터 API</text>
-  <text x="620" y="600" class="aws-small" fill="white">• 기상청 API</text>
-  <text x="620" y="615" class="aws-small" fill="white">• 한강홍수통제소</text>
-  <text x="620" y="630" class="aws-small" fill="white">• 행정안전부</text>
-
-  <!-- Weather APIs -->
-  <rect x="820" y="560" width="200" height="80" class="aws-purple" rx="5"/>
-  <text x="920" y="580" text-anchor="middle" class="aws-white-text">기상 정보</text>
-  <text x="840" y="600" class="aws-small" fill="white">• 실시간 강수량</text>
-  <text x="840" y="615" class="aws-small" fill="white">• 수위 정보</text>
-  <text x="840" y="630" class="aws-small" fill="white">• 예보 데이터</text>
-
-  <!-- Emergency Services -->
-  <rect x="1040" y="560" width="200" height="80" class="aws-red" rx="5"/>
-  <text x="1140" y="580" text-anchor="middle" class="aws-white-text">재해 정보</text>
-  <text x="1060" y="600" class="aws-small" fill="white">• 재해문자 발송</text>
-  <text x="1060" y="615" class="aws-small" fill="white">• 대피소 정보</text>
-  <text x="1060" y="630" class="aws-small" fill="white">• 응급 서비스</text>
-
-  <!-- Data Flow and Monitoring -->
-  <rect x="340" y="680" width="980" height="120" fill="#e8f5e8" stroke="#2e7d32" stroke-width="2" rx="10"/>
-  <text x="360" y="700" class="aws-subtitle" fill="#2e7d32">데이터 플로우 및 모니터링</text>
-
-  <!-- Real-time Processing -->
-  <rect x="380" y="720" width="150" height="60" class="aws-orange" rx="5"/>
-  <text x="455" y="740" text-anchor="middle" class="aws-white-text">실시간 처리</text>
-  <text x="455" y="755" text-anchor="middle" class="aws-white-text">EventBridge</text>
-  <text x="455" y="770" text-anchor="middle" class="aws-white-text">SQS/SNS</text>
-
-  <!-- Data Analytics -->
-  <rect x="550" y="720" width="150" height="60" class="aws-blue" rx="5"/>
-  <text x="625" y="740" text-anchor="middle" class="aws-white-text">데이터 분석</text>
-  <text x="625" y="755" text-anchor="middle" class="aws-white-text">Kinesis</text>
-  <text x="625" y="770" text-anchor="middle" class="aws-white-text">Analytics</text>
-
-  <!-- Backup & Recovery -->
-  <rect x="720" y="720" width="150" height="60" class="aws-green" rx="5"/>
-  <text x="795" y="740" text-anchor="middle" class="aws-white-text">백업 & 복구</text>
-  <text x="795" y="755" text-anchor="middle" class="aws-white-text">S3 Glacier</text>
-  <text x="795" y="770" text-anchor="middle" class="aws-white-text">Point-in-Time</text>
+  <!-- Emergency API -->
+  <rect x="880" y="420" width="150" height="60" class="aws-red" rx="5"/>
+  <text x="955" y="445" text-anchor="middle" class="aws-white">재해정보</text>
+  <text x="955" y="460" text-anchor="middle" class="aws-white">API</text>
 
   <!-- Security & Compliance -->
-  <rect x="890" y="720" width="150" height="60" class="aws-red" rx="5"/>
-  <text x="965" y="740" text-anchor="middle" class="aws-white-text">보안 & 컴플라이언스</text>
-  <text x="965" y="755" text-anchor="middle" class="aws-white-text">WAF</text>
-  <text x="965" y="770" text-anchor="middle" class="aws-white-text">Shield</text>
-
-  <!-- Cost Optimization -->
-  <rect x="1060" y="720" width="150" height="60" class="aws-purple" rx="5"/>
-  <text x="1135" y="740" text-anchor="middle" class="aws-white-text">비용 최적화</text>
-  <text x="1135" y="755" text-anchor="middle" class="aws-white-text">Cost Explorer</text>
-  <text x="1135" y="770" text-anchor="middle" class="aws-white-text">Budgets</text>
+  <rect x="300" y="530" width="800" height="70" fill="#f8f9fa" stroke="#dee2e6" rx="8"/>
+  <text x="320" y="555" class="aws-text">Security & Compliance</text>
+  <text x="320" y="575" class="aws-small">• IAM 권한 관리 • VPC 네트워크 격리 • HTTPS/SSL 암호화 • WAF 웹 방화벽</text>
+  <text x="320" y="590" class="aws-small">• CloudTrail 감사 로그 • GuardDuty 위협 탐지 • Config 규정 준수</text>
 
   <!-- Connection Lines -->
   <!-- User to CloudFront -->
-  <line x1="250" y1="140" x2="360" y2="230" class="aws-data-flow"/>
-  
+  <line x1="200" y1="130" x2="320" y2="210" class="data-flow"/>
+  <text x="250" y="165" class="aws-small">HTTPS</text>
+
   <!-- CloudFront to S3 -->
-  <line x1="440" y1="230" x2="480" y2="230" class="aws-arrow"/>
-  
+  <line x1="420" y1="210" x2="450" y2="210" class="arrow"/>
+
   <!-- API Gateway to Lambda -->
-  <line x1="680" y1="230" x2="720" y2="230" class="aws-arrow"/>
-  
+  <line x1="680" y1="210" x2="710" y2="210" class="arrow"/>
+
   <!-- Lambda to DynamoDB -->
-  <line x1="800" y1="230" x2="860" y2="230" class="aws-arrow"/>
-  
+  <line x1="810" y1="210" x2="840" y2="210" class="arrow"/>
+
   <!-- Lambda to External APIs -->
-  <line x1="760" y1="260" x2="760" y2="520" class="aws-data-flow"/>
-  
-  <!-- CloudWatch connections -->
-  <line x1="680" y1="300" x2="680" y2="260" class="aws-arrow"/>
-  <line x1="720" y1="320" x2="760" y2="260" class="aws-arrow"/>
+  <line x1="760" y1="240" x2="760" y2="380" class="data-flow"/>
+  <text x="770" y="310" class="aws-small">API Calls</text>
 
-  <!-- Labels -->
-  <text x="300" y="140" class="aws-small">HTTPS/SSL</text>
-  <text x="460" y="220" class="aws-small">정적 콘텐츠</text>
-  <text x="700" y="220" class="aws-small">API 호출</text>
-  <text x="830" y="220" class="aws-small">데이터 저장</text>
-  <text x="770" y="400" class="aws-small">외부 API 호출</text>
+  <!-- Performance Indicators -->
+  <rect x="50" y="620" width="1100" height="60" fill="#e3f2fd" stroke="#1976d2" rx="8"/>
+  <text x="70" y="645" class="aws-text" fill="#1976d2">Performance & Scalability</text>
+  <text x="70" y="665" class="aws-small">응답시간: &lt;200ms | 가용성: 99.9% | 자동 스케일링 | 글로벌 CDN | 실시간 모니터링</text>
 
-  <!-- Performance Metrics -->
-  <rect x="50" y="820" width="1300" height="60" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1" rx="5"/>
-  <text x="70" y="840" class="aws-text">성능 지표:</text>
-  <text x="70" y="855" class="aws-small">• 응답 시간: &lt; 200ms | • 가용성: 99.9% | • 처리량: 1000 req/sec | • 데이터 신선도: &lt; 5분</text>
-  
-  <text x="700" y="840" class="aws-text">보안 기능:</text>
-  <text x="700" y="855" class="aws-small">• HTTPS 암호화 | • IAM 권한 관리 | • VPC 네트워크 격리 | • WAF 웹 방화벽</text>
+  <!-- Data Flow Labels -->
+  <text x="370" y="200" class="aws-small">정적 콘텐츠</text>
+  <text x="630" y="200" class="aws-small">API 요청</text>
+  <text x="760" y="200" class="aws-small">비즈니스 로직</text>
+  <text x="890" y="200" class="aws-small">데이터 저장</text>
 </svg>
