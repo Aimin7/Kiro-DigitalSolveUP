@@ -16,6 +16,7 @@ yarn-error.log*
 dist/
 build/
 .dist/
+.webpack/
 
 # AWS
 .aws/

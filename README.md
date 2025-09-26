@@ -8,7 +8,15 @@
 ![KIRO 홍수 정보 시스템 구성도](docs/architecture-diagram.svg)
 
 ### AWS 클라우드 아키텍처
-![AWS 아키텍처 다이어그램](docs/aws-architecture-diagram.svg)
+📋 **[AWS 아키텍처 상세 보기](docs/AWS_ARCHITECTURE.md)**
+
+```
+사용자 → CloudFront → S3 (정적 웹사이트)
+       ↓
+    API Gateway → Lambda → DynamoDB
+       ↓
+    외부 API (네이버, 공공데이터, 기상청)
+```
 
 ## 🚀 주요 기능
 
