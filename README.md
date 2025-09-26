@@ -1,11 +1,11 @@
-# KIRO 사회현안 해결하기 - 홍수 정보 시스템
+# 침수 정보 표시 앱
 
 실시간 홍수 정보를 제공하는 웹 애플리케이션입니다.
 
 ## 🏗️ 시스템 구성도
 
 ### 전체 시스템 아키텍처
-![KIRO 홍수 정보 시스템 구성도](docs/architecture-diagram.svg)
+![침수 정보 표시 앱 구성도](docs/architecture-diagram.svg)
 
 ### AWS 클라우드 아키텍처
 📋 **[AWS 아키텍처 상세 보기](docs/AWS_ARCHITECTURE.md)**

@@ -1,7 +1,7 @@
 {
-  "name": "kiro-flood-info-system",
+  "name": "flood-info-display-app",
   "version": "1.0.0",
-  "description": "실시간 홍수 정보 제공 시스템 - Real-time flood information system",
+  "description": "침수 정보 표시 앱 - Flood information display app",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -23,12 +23,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Aimin7/kiro-flood-info-system.git"
+    "url": "https://github.com/Aimin7/flood-info-display-app.git"
   },
   "bugs": {
-    "url": "https://github.com/Aimin7/kiro-flood-info-system/issues"
+    "url": "https://github.com/Aimin7/flood-info-display-app/issues"
   },
-  "homepage": "https://github.com/Aimin7/kiro-flood-info-system#readme",
+  "homepage": "https://github.com/Aimin7/flood-info-display-app#readme",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5"
