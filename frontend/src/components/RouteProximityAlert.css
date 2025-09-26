@@ -1,0 +1,544 @@
+/* RouteProximityAlert.css */
+/* 경로 근접성 알림 컴포넌트 스타일 */
+
+.route-proximity-alert {
+  position: fixed;
+  z-index: 9999;
+  width: 350px;
+  max-width: 90vw;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 위치별 스타일 */
+.route-proximity-alert.top-left {
+  top: 20px;
+  left: 20px;
+}
+
+.route-proximity-alert.top-right {
+  top: 20px;
+  right: 20px;
+}
+
+.route-proximity-alert.bottom-left {
+  bottom: 20px;
+  left: 20px;
+}
+
+.route-proximity-alert.bottom-right {
+  bottom: 20px;
+  right: 20px;
+}
+
+/* 알림 레벨별 색상 */
+.route-proximity-alert.high {
+  border-left: 5px solid #f44336;
+}
+
+.route-proximity-alert.medium {
+  border-left: 5px solid #ff9800;
+}
+
+.route-proximity-alert.low {
+  border-left: 5px solid #2196f3;
+}
+
+.route-proximity-alert.safe {
+  border-left: 5px solid #4caf50;
+}
+
+/* 확장 상태 */
+.route-proximity-alert.expanded {
+  width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* 알림 헤더 */
+.alert-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.alert-header:hover {
+  background-color: #f8f9fa;
+}
+
+.alert-icon {
+  font-size: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.alert-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-title h4 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.alert-summary {
+  margin: 0;
+  font-size: 13px;
+  color: #6c757d;
+  line-height: 1.4;
+}
+
+.alert-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.safety-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+}
+
+.safety-score.high {
+  background-color: #4caf50;
+}
+
+.safety-score.medium {
+  background-color: #ff9800;
+}
+
+.safety-score.low {
+  background-color: #f44336;
+}
+
+.toggle-button,
+.close-button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #6c757d;
+  transition: all 0.2s ease;
+}
+
+.toggle-button:hover,
+.close-button:hover {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+/* 알림 콘텐츠 */
+.alert-content {
+  padding: 0 20px 20px 20px;
+}
+
+.alert-content h5 {
+  margin: 20px 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 6px;
+}
+
+.alert-content h5:first-child {
+  margin-top: 16px;
+}
+
+/* 경로 분석 */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.analysis-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.analysis-item .label {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.analysis-item .value {
+  font-size: 13px;
+  color: #212529;
+  font-weight: 600;
+}
+
+.analysis-item .value.safety-high {
+  color: #4caf50;
+}
+
+.analysis-item .value.safety-medium {
+  color: #ff9800;
+}
+
+.analysis-item .value.safety-low {
+  color: #f44336;
+}
+
+/* 위험 지점 목록 */
+.points-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.point-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #e9ecef;
+}
+
+.point-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.point-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.severity-badge {
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.severity-high {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.severity-medium {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.severity-low {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.alert-type {
+  font-size: 11px;
+  color: #495057;
+  font-weight: 500;
+}
+
+.distance {
+  font-size: 11px;
+  color: #6c757d;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.point-location {
+  font-size: 11px;
+  color: #6c757d;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 2px;
+}
+
+.point-apis {
+  font-size: 10px;
+  color: #6c757d;
+}
+
+.view-details-button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.view-details-button:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.more-points {
+  text-align: center;
+  padding: 8px;
+  font-size: 12px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* 권장 사항 */
+.recommendation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recommendation-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #2196f3;
+}
+
+.rec-icon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.rec-text {
+  font-size: 13px;
+  color: #495057;
+  line-height: 1.4;
+}
+
+/* 안전한 경로 정보 */
+.safe-route-info {
+  padding: 16px 0;
+}
+
+.safe-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #e8f5e8;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+}
+
+.safe-icon {
+  font-size: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.safe-text p {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #2e7d32;
+  line-height: 1.4;
+}
+
+.safe-detail {
+  font-size: 12px !important;
+  color: #4caf50 !important;
+  font-weight: 500;
+}
+
+/* 액션 버튼 */
+.alert-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e9ecef;
+}
+
+.alternative-button {
+  flex: 1;
+  padding: 10px 16px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.alternative-button:hover {
+  background: #1976d2;
+  transform: translateY(-1px);
+}
+
+.dismiss-button {
+  padding: 10px 16px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dismiss-button:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+/* 자동 닫기 진행 표시 */
+.auto-close-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #2196f3;
+  width: 100%;
+  transform: translateX(-100%);
+  animation: progress-fill linear;
+}
+
+@keyframes progress-fill {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .route-proximity-alert {
+    width: 320px;
+    max-width: 95vw;
+  }
+
+  .route-proximity-alert.expanded {
+    width: 350px;
+    max-width: 95vw;
+  }
+
+  .route-proximity-alert.top-left,
+  .route-proximity-alert.top-right {
+    top: 10px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .route-proximity-alert.bottom-left,
+  .route-proximity-alert.bottom-right {
+    bottom: 10px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .alert-header {
+    padding: 12px 16px;
+  }
+
+  .alert-content {
+    padding: 0 16px 16px 16px;
+  }
+
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .point-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .distance {
+    margin-left: 0;
+  }
+
+  .alert-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .route-proximity-alert {
+    width: 100%;
+    max-width: 100vw;
+    border-radius: 0;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+
+  .route-proximity-alert.expanded {
+    width: 100%;
+    max-height: 100vh;
+  }
+
+  .alert-header {
+    padding: 16px;
+  }
+
+  .alert-content {
+    padding: 0 16px 20px 16px;
+  }
+
+  .safe-message {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+}

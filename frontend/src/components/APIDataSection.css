@@ -1,0 +1,484 @@
+/* APIDataSection.css */
+/* 개별 API 정보 표시 컴포넌트 스타일 */
+
+.api-data-section {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.api-data-section:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.api-data-section.no-data {
+  opacity: 0.6;
+  background: #f8f9fa;
+}
+
+/* API 헤더 */
+.api-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.api-header:hover {
+  background: #e9ecef;
+}
+
+.api-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.api-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.api-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.data-timestamp {
+  font-size: 12px;
+  color: #6c757d;
+  margin-left: 8px;
+  font-family: 'Courier New', monospace;
+}
+
+.api-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-indicator {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-indicator.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.no-data-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #f8d7da;
+  color: #721c24;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.toggle-button:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #495057;
+}
+
+/* API 콘텐츠 */
+.api-content {
+  padding: 20px;
+}
+
+.content-section {
+  margin-bottom: 20px;
+}
+
+.content-section:last-child {
+  margin-bottom: 0;
+}
+
+.content-section h5 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 6px;
+}
+
+/* 정보 행 */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row .label {
+  font-size: 13px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.info-row .value {
+  font-size: 13px;
+  color: #212529;
+  font-weight: 600;
+}
+
+.info-row .value.alert-type {
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #fff3cd;
+  color: #856404;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 수위관측소 콘텐츠 */
+.water-levels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.level-card {
+  text-align: center;
+  padding: 16px 12px;
+  border-radius: 8px;
+  border: 2px solid;
+  transition: transform 0.2s ease;
+}
+
+.level-card:hover {
+  transform: translateY(-2px);
+}
+
+.level-card.current {
+  background: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.level-card.alert {
+  background: #fff3e0;
+  border-color: #ff9800;
+}
+
+.level-card.danger {
+  background: #ffebee;
+  border-color: #f44336;
+}
+
+.level-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.level-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #212529;
+  font-family: 'Courier New', monospace;
+}
+
+.level-status {
+  margin-top: 16px;
+}
+
+.status-bar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.status-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.status-text {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* 실시간수위 콘텐츠 */
+.measurements {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.measurement-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #2196f3;
+  transition: all 0.2s ease;
+}
+
+.measurement-card:hover {
+  background: #e9ecef;
+  transform: translateX(4px);
+}
+
+.measurement-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.measurement-info {
+  flex: 1;
+}
+
+.measurement-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.measurement-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2196f3;
+  font-family: 'Courier New', monospace;
+}
+
+.trend-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+}
+
+.trend-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.trend-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* 홍수예보발령 콘텐츠 */
+.time-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.time-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.time-row:last-child {
+  border-bottom: none;
+}
+
+.time-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.time-value {
+  font-size: 13px;
+  color: #212529;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.description {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #2196f3;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #495057;
+}
+
+.validity-status {
+  display: flex;
+  justify-content: center;
+}
+
+.validity-indicator {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.validity-indicator.valid {
+  background: #d4edda;
+  color: #155724;
+}
+
+.validity-indicator.expired {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.validity-indicator.unknown {
+  background: #e2e3e5;
+  color: #6c757d;
+}
+
+/* API 타입별 색상 테마 */
+.api-data-section.waterlevel .api-header {
+  border-left: 4px solid #2196f3;
+}
+
+.api-data-section.realtime .api-header {
+  border-left: 4px solid #4caf50;
+}
+
+.api-data-section.forecast .api-header {
+  border-left: 4px solid #ff9800;
+}
+
+/* 알 수 없는 API */
+.unknown-api {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .api-header {
+    padding: 12px 16px;
+  }
+
+  .api-title {
+    gap: 8px;
+  }
+
+  .api-name {
+    font-size: 14px;
+  }
+
+  .data-timestamp {
+    display: none;
+  }
+
+  .api-content {
+    padding: 16px;
+  }
+
+  .water-levels {
+    grid-template-columns: 1fr;
+  }
+
+  .measurements {
+    grid-template-columns: 1fr;
+  }
+
+  .level-card,
+  .measurement-card {
+    padding: 12px;
+  }
+
+  .level-value {
+    font-size: 16px;
+  }
+
+  .measurement-value {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .api-header {
+    padding: 10px 12px;
+  }
+
+  .api-content {
+    padding: 12px;
+  }
+
+  .content-section {
+    margin-bottom: 16px;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .measurement-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .trend-indicator {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+}

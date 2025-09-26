@@ -1,0 +1,727 @@
+{
+  "info": {
+    "name": "침수 정보 표시 앱 API",
+    "description": "한강홍수통제소 API와 네이버 지도 API를 연동하여 실시간 홍수 정보를 제공하는 API 컬렉션입니다.",
+    "version": "1.2.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-API-Key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{api_key}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.flood-info.example.com",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "your-api-key-here",
+      "type": "string"
+    },
+    {
+      "key": "test_latitude",
+      "value": "37.5665",
+      "type": "string"
+    },
+    {
+      "key": "test_longitude",
+      "value": "126.9780",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "홍수 데이터",
+      "item": [
+        {
+          "name": "전체 홍수 데이터 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/flood-data?severity=medium&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "flood-data"],
+              "query": [
+                {
+                  "key": "severity",
+                  "value": "medium",
+                  "description": "심각도 필터 (low, medium, high)"
+                },
+                {
+                  "key": "alertType",
+                  "value": "경보",
+                  "disabled": true,
+                  "description": "경보 유형 필터 (주의보, 경보, 특보)"
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "결과 개수 제한"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "disabled": true,
+                  "description": "결과 시작 위치"
+                }
+              ]
+            },
+            "description": "현재 활성화된 모든 홍수 정보를 조회합니다."
+          },
+          "response": []
+        },
+        {
+          "name": "위치 기반 홍수 데이터 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/flood-data/location?latitude={{test_latitude}}&longitude={{test_longitude}}&radius=5000",
+              "host": ["{{base_url}}"],
+              "path": ["api", "flood-data", "location"],
+              "query": [
+                {
+                  "key": "latitude",
+                  "value": "{{test_latitude}}",
+                  "description": "중심 위도"
+                },
+                {
+                  "key": "longitude",
+                  "value": "{{test_longitude}}",
+                  "description": "중심 경도"
+                },
+                {
+                  "key": "radius",
+                  "value": "5000",
+                  "description": "검색 반경 (미터)"
+                },
+                {
+                  "key": "severity",
+                  "value": "medium",
+                  "disabled": true,
+                  "description": "심각도 필터"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true,
+                  "description": "결과 개수 제한"
+                }
+              ]
+            },
+            "description": "특정 위치 주변의 홍수 정보를 조회합니다."
+          },
+          "response": []
+        },
+        {
+          "name": "다중 소스 데이터 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/flood-data/multi-source/loc_37.5665_126.9780",
+              "host": ["{{base_url}}"],
+              "path": ["api", "flood-data", "multi-source", "loc_37.5665_126.9780"]
+            },
+            "description": "특정 위치의 모든 API 소스 데이터를 조회합니다."
+          },
+          "response": []
+        },
+        {
+          "name": "한강홍수통제소 원본 데이터 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/flood-data/hanriver?apiType=waterlevel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "flood-data", "hanriver"],
+              "query": [
+                {
+                  "key": "apiType",
+                  "value": "waterlevel",
+                  "description": "API 타입 (waterlevel, realtime, forecast)"
+                },
+                {
+                  "key": "region",
+                  "value": "한강상류",
+                  "disabled": true,
+                  "description": "지역 필터"
+                }
+              ]
+            },
+            "description": "한강홍수통제소 API의 원본 데이터를 조회합니다."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "데이터 관리",
+      "item": [
+        {
+          "name": "데이터 갱신",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"apiTypes\": [\"waterlevel\", \"realtime\", \"forecast\"],\n  \"forceRefresh\": false,\n  \"region\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/flood-data/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["api", "flood-data", "refresh"]
+            },
+            "description": "외부 API에서 최신 데이터를 가져와 갱신합니다."
+          },
+          "response": []
+        },
+        {
+          "name": "데이터 상태 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/flood-data/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "flood-data", "status"]
+            },
+            "description": "시스템의 데이터 상태와 통계를 조회합니다."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "네이버 지도",
+      "item": [
+        {
+          "name": "안전 경로 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/directions/safe-route?start=126.9780,37.5665&goal=127.0276,37.4979&option=trafast",
+              "host": ["{{base_url}}"],
+              "path": ["api", "directions", "safe-route"],
+              "query": [
+                {
+                  "key": "start",
+                  "value": "126.9780,37.5665",
+                  "description": "출발지 좌표 (longitude,latitude)"
+                },
+                {
+                  "key": "goal",
+                  "value": "127.0276,37.4979",
+                  "description": "도착지 좌표 (longitude,latitude)"
+                },
+                {
+                  "key": "waypoints",
+                  "value": "126.9850,37.5600",
+                  "disabled": true,
+                  "description": "경유지 좌표들 (: 구분)"
+                },
+                {
+                  "key": "option",
+                  "value": "trafast",
+                  "description": "경로 옵션 (trafast, tracomfort, traoptimal)"
+                }
+              ]
+            },
+            "description": "홍수 지역을 피하는 안전한 경로를 조회합니다."
+          },
+          "response": []
+        },
+        {
+          "name": "경로 근접성 검사",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"routePath\": [\n    [126.9780, 37.5665],\n    [126.9850, 37.5600],\n    [127.0276, 37.4979]\n  ],\n  \"proximityRadius\": 1500\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/directions/check-proximity",
+              "host": ["{{base_url}}"],
+              "path": ["api", "directions", "check-proximity"]
+            },
+            "description": "경로가 홍수 지역과 근접한지 검사합니다."
+          },
+          "response": []
+        },
+        {
+          "name": "대체 경로 계산",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"originalRoute\": {\n    \"path\": [\n      [126.9780, 37.5665],\n      [127.0276, 37.4979]\n    ]\n  },\n  \"avoidPoints\": [\n    {\n      \"latitude\": 37.5600,\n      \"longitude\": 126.9850\n    }\n  ],\n  \"proximityRadius\": 1500\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/directions/alternative-route",
+              "host": ["{{base_url}}"],
+              "path": ["api", "directions", "alternative-route"]
+            },
+            "description": "홍수 지역을 피하는 대체 경로를 계산합니다."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "지오코딩",
+      "item": [
+        {
+          "name": "주소-좌표 변환",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": \"서울특별시 중구 세종대로 110\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/geocoding/address",
+              "host": ["{{base_url}}"],
+              "path": ["api", "geocoding", "address"]
+            },
+            "description": "주소를 좌표로 변환합니다."
+          },
+          "response": []
+        },
+        {
+          "name": "좌표-주소 변환",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": 37.5662952,\n  \"longitude\": 126.9779692\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/geocoding/reverse",
+              "host": ["{{base_url}}"],
+              "path": ["api", "geocoding", "reverse"]
+            },
+            "description": "좌표를 주소로 변환합니다."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "시스템",
+      "item": [
+        {
+          "name": "헬스 체크",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            },
+            "description": "시스템 상태를 확인합니다."
+          },
+          "response": []
+        },
+        {
+          "name": "시스템 상태",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "status"]
+            },
+            "description": "상세한 시스템 상태를 조회합니다."
+          },
+          "response": []
+        },
+        {
+          "name": "메트릭 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/metrics",
+              "host": ["{{base_url}}"],
+              "path": ["api", "metrics"]
+            },
+            "description": "시스템 메트릭을 조회합니다."
+          },
+          "response": []
+        },
+        {
+          "name": "로그 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/logs?level=ERROR&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "logs"],
+              "query": [
+                {
+                  "key": "level",
+                  "value": "ERROR",
+                  "description": "로그 레벨 필터"
+                },
+                {
+                  "key": "limit",
+                  "value": "100",
+                  "description": "결과 개수 제한"
+                },
+                {
+                  "key": "startTime",
+                  "value": "2023-07-15T00:00:00Z",
+                  "disabled": true,
+                  "description": "시작 시간"
+                },
+                {
+                  "key": "endTime",
+                  "value": "2023-07-15T23:59:59Z",
+                  "disabled": true,
+                  "description": "종료 시간"
+                }
+              ]
+            },
+            "description": "시스템 로그를 조회합니다."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "테스트 시나리오",
+      "item": [
+        {
+          "name": "기본 워크플로우 테스트",
+          "item": [
+            {
+              "name": "1. 헬스 체크",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/health",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "health"]
+                },
+                "description": "시스템이 정상 동작하는지 확인"
+              },
+              "response": []
+            },
+            {
+              "name": "2. 데이터 상태 확인",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/flood-data/status",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "flood-data", "status"]
+                },
+                "description": "홍수 데이터 상태 확인"
+              },
+              "response": []
+            },
+            {
+              "name": "3. 홍수 데이터 조회",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/flood-data?limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "flood-data"],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                },
+                "description": "기본 홍수 데이터 조회"
+              },
+              "response": []
+            },
+            {
+              "name": "4. 위치 기반 검색",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/flood-data/location?latitude={{test_latitude}}&longitude={{test_longitude}}&radius=3000",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "flood-data", "location"],
+                  "query": [
+                    {
+                      "key": "latitude",
+                      "value": "{{test_latitude}}"
+                    },
+                    {
+                      "key": "longitude",
+                      "value": "{{test_longitude}}"
+                    },
+                    {
+                      "key": "radius",
+                      "value": "3000"
+                    }
+                  ]
+                },
+                "description": "특정 위치 주변 홍수 정보 검색"
+              },
+              "response": []
+            },
+            {
+              "name": "5. 안전 경로 계산",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/directions/safe-route?start=126.9780,37.5665&goal=127.0276,37.4979",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "directions", "safe-route"],
+                  "query": [
+                    {
+                      "key": "start",
+                      "value": "126.9780,37.5665"
+                    },
+                    {
+                      "key": "goal",
+                      "value": "127.0276,37.4979"
+                    }
+                  ]
+                },
+                "description": "안전한 경로 계산"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "오류 처리 테스트",
+          "item": [
+            {
+              "name": "잘못된 좌표 (400 오류)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/flood-data/location?latitude=invalid&longitude=invalid",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "flood-data", "location"],
+                  "query": [
+                    {
+                      "key": "latitude",
+                      "value": "invalid"
+                    },
+                    {
+                      "key": "longitude",
+                      "value": "invalid"
+                    }
+                  ]
+                },
+                "description": "잘못된 좌표로 400 오류 테스트"
+              },
+              "response": []
+            },
+            {
+              "name": "존재하지 않는 위치 ID (404 오류)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/flood-data/multi-source/invalid_location_id",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "flood-data", "multi-source", "invalid_location_id"]
+                },
+                "description": "존재하지 않는 위치 ID로 404 오류 테스트"
+              },
+              "response": []
+            },
+            {
+              "name": "잘못된 API 키 (401 오류)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-API-Key",
+                    "value": "invalid-api-key"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"apiTypes\": [\"waterlevel\"]\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/flood-data/refresh",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "flood-data", "refresh"]
+                },
+                "description": "잘못된 API 키로 401 오류 테스트"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "성능 테스트",
+          "item": [
+            {
+              "name": "대량 데이터 조회",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/flood-data?limit=1000",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "flood-data"],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "1000"
+                    }
+                  ]
+                },
+                "description": "대량 데이터 조회 성능 테스트"
+              },
+              "response": []
+            },
+            {
+              "name": "복잡한 경로 계산",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/directions/safe-route?start=126.9780,37.5665&goal=127.0276,37.4979&waypoints=126.9850,37.5600:126.9900,37.5500",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "directions", "safe-route"],
+                  "query": [
+                    {
+                      "key": "start",
+                      "value": "126.9780,37.5665"
+                    },
+                    {
+                      "key": "goal",
+                      "value": "127.0276,37.4979"
+                    },
+                    {
+                      "key": "waypoints",
+                      "value": "126.9850,37.5600:126.9900,37.5500"
+                    }
+                  ]
+                },
+                "description": "복잡한 경로 계산 성능 테스트"
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// 요청 전 공통 처리",
+          "console.log('Request to:', pm.request.url.toString());",
+          "",
+          "// 타임스탬프 추가",
+          "pm.globals.set('timestamp', new Date().toISOString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// 응답 후 공통 검증",
+          "pm.test('Status code is success', function () {",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202]);",
+          "});",
+          "",
+          "pm.test('Response time is less than 5000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "pm.test('Response has success field', function () {",
+          "    const jsonData = pm.response.json();",
+          "    pm.expect(jsonData).to.have.property('success');",
+          "});",
+          "",
+          "pm.test('Response has timestamp', function () {",
+          "    const jsonData = pm.response.json();",
+          "    if (jsonData.success) {",
+          "        pm.expect(jsonData).to.have.property('timestamp');",
+          "    }",
+          "});",
+          "",
+          "// 오류 응답 검증",
+          "if (pm.response.code >= 400) {",
+          "    pm.test('Error response has proper structure', function () {",
+          "        const jsonData = pm.response.json();",
+          "        pm.expect(jsonData.success).to.be.false;",
+          "        pm.expect(jsonData).to.have.property('error');",
+          "        pm.expect(jsonData.error).to.have.property('code');",
+          "        pm.expect(jsonData.error).to.have.property('message');",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ]
+}

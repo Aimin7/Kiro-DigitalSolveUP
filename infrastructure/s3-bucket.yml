@@ -1,0 +1,120 @@
+# S3 버킷 정의 (정적 웹사이트 호스팅)
+# AWS CloudFormation 템플릿
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'S3 bucket for Flood Info App static website hosting'
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prod
+    Description: Deployment stage
+
+  BucketName:
+    Type: String
+    Default: flood-info-app
+    Description: Base name for S3 bucket
+
+Resources:
+  # 정적 웹사이트 호스팅용 S3 버킷
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${BucketName}-${Stage}-${AWS::AccountId}'
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+              - HEAD
+            AllowedOrigins:
+              - '*'
+            MaxAge: 3600
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: Project
+          Value: FloodInfoApp
+        - Key: Stage
+          Value: !Ref Stage
+        - Key: Component
+          Value: Frontend
+
+  # S3 버킷 정책 (퍼블릭 읽기 권한)
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebsiteBucket
+      PolicyDocument:
+        Statement:
+          - Sid: PublicReadGetObject
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Sub '${WebsiteBucket}/*'
+          - Sid: PublicReadGetBucketLocation
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetBucketLocation'
+            Resource: !Ref WebsiteBucket
+
+  # 로그 저장용 S3 버킷 (선택사항)
+  LogsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${BucketName}-logs-${Stage}-${AWS::AccountId}'
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldLogs
+            Status: Enabled
+            ExpirationInDays: 30
+            NoncurrentVersionExpirationInDays: 7
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Project
+          Value: FloodInfoApp
+        - Key: Stage
+          Value: !Ref Stage
+        - Key: Component
+          Value: Logs
+
+Outputs:
+  WebsiteBucketName:
+    Description: Name of the website bucket
+    Value: !Ref WebsiteBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-WebsiteBucket'
+
+  WebsiteURL:
+    Description: URL of the website
+    Value: !GetAtt WebsiteBucket.WebsiteURL
+    Export:
+      Name: !Sub '${AWS::StackName}-WebsiteURL'
+
+  WebsiteBucketDomainName:
+    Description: Domain name of the website bucket
+    Value: !GetAtt WebsiteBucket.DomainName
+    Export:
+      Name: !Sub '${AWS::StackName}-WebsiteBucketDomain'
+
+  LogsBucketName:
+    Description: Name of the logs bucket
+    Value: !Ref LogsBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-LogsBucket'

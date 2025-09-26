@@ -1,0 +1,1232 @@
+openapi: 3.0.3
+info:
+  title: 침수 정보 표시 앱 API
+  description: |
+    한강홍수통제소 API와 네이버 지도 API를 연동하여 실시간 홍수 정보를 제공하는 API입니다.
+    
+    ## 주요 기능
+    - 실시간 홍수 데이터 조회
+    - 위치 기반 홍수 정보 검색
+    - 안전 경로 계산
+    - 경로 근접성 검사
+    - WebSocket을 통한 실시간 업데이트
+    
+    ## 인증
+    API 키가 필요한 경우 `X-API-Key` 헤더에 포함하여 요청하세요.
+  version: 1.2.0
+  contact:
+    name: API Support
+    email: support@flood-info.example.com
+    url: https://docs.flood-info.example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.flood-info.example.com
+    description: 프로덕션 서버
+  - url: https://staging-api.flood-info.example.com
+    description: 스테이징 서버
+  - url: https://dev-api.flood-info.example.com
+    description: 개발 서버
+
+security:
+  - ApiKeyAuth: []
+  - {}
+
+paths:
+  /api/flood-data:
+    get:
+      summary: 전체 홍수 데이터 조회
+      description: 현재 활성화된 모든 홍수 정보를 조회합니다.
+      tags:
+        - 홍수 데이터
+      parameters:
+        - name: severity
+          in: query
+          description: 심각도 필터
+          required: false
+          schema:
+            type: string
+            enum: [low, medium, high]
+        - name: alertType
+          in: query
+          description: 경보 유형 필터
+          required: false
+          schema:
+            type: string
+            enum: [주의보, 경보, 특보]
+        - name: limit
+          in: query
+          description: 결과 개수 제한
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+        - name: offset
+          in: query
+          description: 결과 시작 위치
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FloodDataResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/flood-data/location:
+    get:
+      summary: 위치 기반 홍수 데이터 조회
+      description: 특정 위치 주변의 홍수 정보를 조회합니다.
+      tags:
+        - 홍수 데이터
+      parameters:
+        - name: latitude
+          in: query
+          description: 중심 위도
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -90
+            maximum: 90
+        - name: longitude
+          in: query
+          description: 중심 경도
+          required: true
+          schema:
+            type: number
+            format: double
+            minimum: -180
+            maximum: 180
+        - name: radius
+          in: query
+          description: 검색 반경 (미터)
+          required: false
+          schema:
+            type: integer
+            minimum: 100
+            maximum: 50000
+            default: 5000
+        - name: severity
+          in: query
+          description: 심각도 필터
+          required: false
+          schema:
+            type: string
+            enum: [low, medium, high]
+        - name: limit
+          in: query
+          description: 결과 개수 제한
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationFloodDataResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /api/flood-data/multi-source/{locationId}:
+    get:
+      summary: 다중 소스 데이터 조회
+      description: 특정 위치의 모든 API 소스 데이터를 조회합니다.
+      tags:
+        - 홍수 데이터
+      parameters:
+        - name: locationId
+          in: path
+          description: 위치 ID
+          required: true
+          schema:
+            type: string
+            pattern: '^loc_[0-9]+\.[0-9]+_[0-9]+\.[0-9]+$'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultiSourceDataResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/flood-data/refresh:
+    post:
+      summary: 데이터 갱신
+      description: 외부 API에서 최신 데이터를 가져와 갱신합니다.
+      tags:
+        - 데이터 관리
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /api/flood-data/status:
+    get:
+      summary: 데이터 상태 조회
+      description: 시스템의 데이터 상태와 통계를 조회합니다.
+      tags:
+        - 데이터 관리
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+
+  /api/directions/safe-route:
+    get:
+      summary: 안전 경로 조회
+      description: 홍수 지역을 피하는 안전한 경로를 조회합니다.
+      tags:
+        - 네이버 지도
+      parameters:
+        - name: start
+          in: query
+          description: 출발지 좌표 (longitude,latitude)
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9]+\.[0-9]+,[0-9]+\.[0-9]+$'
+        - name: goal
+          in: query
+          description: 도착지 좌표 (longitude,latitude)
+          required: true
+          schema:
+            type: string
+            pattern: '^[0-9]+\.[0-9]+,[0-9]+\.[0-9]+$'
+        - name: waypoints
+          in: query
+          description: 경유지 좌표들 (: 구분)
+          required: false
+          schema:
+            type: string
+        - name: option
+          in: query
+          description: 경로 옵션
+          required: false
+          schema:
+            type: string
+            enum: [trafast, tracomfort, traoptimal]
+            default: trafast
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SafeRouteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '502':
+          $ref: '#/components/responses/NaverAPIError'
+
+  /api/directions/check-proximity:
+    post:
+      summary: 경로 근접성 검사
+      description: 경로가 홍수 지역과 근접한지 검사합니다.
+      tags:
+        - 네이버 지도
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProximityCheckRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProximityCheckResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/directions/alternative-route:
+    post:
+      summary: 대체 경로 계산
+      description: 홍수 지역을 피하는 대체 경로를 계산합니다.
+      tags:
+        - 네이버 지도
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlternativeRouteRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlternativeRouteResponse'
+
+  /api/geocoding/address:
+    post:
+      summary: 주소-좌표 변환
+      description: 주소를 좌표로 변환합니다.
+      tags:
+        - 지오코딩
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponse'
+        '502':
+          $ref: '#/components/responses/NaverAPIError'
+
+  /api/geocoding/reverse:
+    post:
+      summary: 좌표-주소 변환
+      description: 좌표를 주소로 변환합니다.
+      tags:
+        - 지오코딩
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReverseGeocodeRequest'
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReverseGeocodeResponse'
+
+  /api/health:
+    get:
+      summary: 헬스 체크
+      description: 시스템 상태를 확인합니다.
+      tags:
+        - 시스템
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/status:
+    get:
+      summary: 시스템 상태
+      description: 상세한 시스템 상태를 조회합니다.
+      tags:
+        - 시스템
+      responses:
+        '200':
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemStatusResponse'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  schemas:
+    FloodInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 홍수 정보 ID
+        locationId:
+          type: string
+          description: 위치 ID
+        latitude:
+          type: number
+          format: double
+          description: 위도
+        longitude:
+          type: number
+          format: double
+          description: 경도
+        alertType:
+          type: string
+          enum: [주의보, 경보, 특보]
+          description: 경보 유형
+        severity:
+          type: string
+          enum: [low, medium, high]
+          description: 심각도
+        timestamp:
+          type: string
+          format: date-time
+          description: 데이터 시간
+        sources:
+          type: array
+          items:
+            type: string
+          description: 데이터 소스 목록
+        availableAPIs:
+          type: array
+          items:
+            type: string
+          description: 사용 가능한 API 목록
+        waterLevelData:
+          $ref: '#/components/schemas/WaterLevelData'
+        realtimeData:
+          $ref: '#/components/schemas/RealtimeData'
+        forecastData:
+          $ref: '#/components/schemas/ForecastData'
+
+    WaterLevelData:
+      type: object
+      properties:
+        stationId:
+          type: string
+        stationName:
+          type: string
+        waterLevel:
+          type: number
+          format: double
+        alertLevel:
+          type: number
+          format: double
+        dangerLevel:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+
+    RealtimeData:
+      type: object
+      properties:
+        stationId:
+          type: string
+        waterLevel:
+          type: number
+          format: double
+        flowRate:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+
+    ForecastData:
+      type: object
+      properties:
+        forecastId:
+          type: string
+        region:
+          type: string
+        alertType:
+          type: string
+        issueTime:
+          type: string
+          format: date-time
+        validUntil:
+          type: string
+          format: date-time
+
+    FloodDataResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FloodInfo'
+        metadata:
+          type: object
+          properties:
+            total:
+              type: integer
+            limit:
+              type: integer
+            offset:
+              type: integer
+            hasMore:
+              type: boolean
+        timestamp:
+          type: string
+          format: date-time
+
+    LocationFloodDataResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/FloodInfo'
+              - type: object
+                properties:
+                  distance:
+                    type: number
+                    format: double
+                    description: 중심점으로부터의 거리 (미터)
+        searchParams:
+          type: object
+          properties:
+            center:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                  format: double
+                longitude:
+                  type: number
+                  format: double
+            radius:
+              type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+    MultiSourceDataResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            locationId:
+              type: string
+            coordinates:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                  format: double
+                longitude:
+                  type: number
+                  format: double
+            alertType:
+              type: string
+            severity:
+              type: string
+            timestamp:
+              type: string
+              format: date-time
+            availableAPIs:
+              type: array
+              items:
+                type: string
+            apiData:
+              type: object
+              additionalProperties: true
+
+    RefreshRequest:
+      type: object
+      properties:
+        apiTypes:
+          type: array
+          items:
+            type: string
+            enum: [waterlevel, realtime, forecast]
+          default: [waterlevel, realtime, forecast]
+        forceRefresh:
+          type: boolean
+          default: false
+        region:
+          type: string
+          nullable: true
+
+    RefreshResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            requestId:
+              type: string
+            timestamp:
+              type: string
+              format: date-time
+            apiTypes:
+              type: array
+              items:
+                type: string
+            results:
+              type: object
+              additionalProperties:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  processed:
+                    type: integer
+                  stored:
+                    type: integer
+                  updated:
+                    type: integer
+                  errors:
+                    type: integer
+            summary:
+              type: object
+              properties:
+                totalProcessed:
+                  type: integer
+                totalStored:
+                  type: integer
+                totalUpdated:
+                  type: integer
+                totalErrors:
+                  type: integer
+                processingTime:
+                  type: integer
+
+    StatusResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            timestamp:
+              type: string
+              format: date-time
+            apis:
+              type: object
+              additionalProperties:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+                  count:
+                    type: integer
+                  error:
+                    type: string
+                    nullable: true
+            overall:
+              type: object
+              properties:
+                totalAPIs:
+                  type: integer
+                availableAPIs:
+                  type: integer
+                totalDataPoints:
+                  type: integer
+                healthScore:
+                  type: integer
+
+    SafeRouteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            route:
+              type: object
+              properties:
+                summary:
+                  type: object
+                  properties:
+                    start:
+                      type: object
+                      properties:
+                        location:
+                          type: array
+                          items:
+                            type: number
+                            format: double
+                    goal:
+                      type: object
+                      properties:
+                        location:
+                          type: array
+                          items:
+                            type: number
+                            format: double
+                    distance:
+                      type: integer
+                    duration:
+                      type: integer
+                    tollFare:
+                      type: integer
+                    fuelPrice:
+                      type: integer
+                path:
+                  type: array
+                  items:
+                    type: array
+                    items:
+                      type: number
+                      format: double
+            safetyAnalysis:
+              type: object
+              properties:
+                isSafe:
+                  type: boolean
+                avoidedFloodAreas:
+                  type: integer
+                riskPoints:
+                  type: array
+                  items:
+                    type: object
+                safetyScore:
+                  type: integer
+            alternatives:
+              type: array
+              items:
+                type: object
+
+    ProximityCheckRequest:
+      type: object
+      required:
+        - routePath
+      properties:
+        routePath:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+              format: double
+        proximityRadius:
+          type: integer
+          default: 1500
+
+    ProximityCheckResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            hasProximityAlert:
+              type: boolean
+            alertPoints:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  locationId:
+                    type: string
+                  coordinates:
+                    type: object
+                    properties:
+                      latitude:
+                        type: number
+                        format: double
+                      longitude:
+                        type: number
+                        format: double
+                  distance:
+                    type: number
+                    format: double
+                  alertType:
+                    type: string
+                  severity:
+                    type: string
+                  alertLevel:
+                    type: string
+            safeRoute:
+              type: boolean
+            minDistance:
+              type: number
+              format: double
+            routeAnalysis:
+              type: object
+              properties:
+                totalDistance:
+                  type: number
+                  format: double
+                checkedPoints:
+                  type: integer
+                floodPointsInArea:
+                  type: integer
+                alertPointsCount:
+                  type: integer
+                severityDistribution:
+                  type: object
+                  properties:
+                    low:
+                      type: integer
+                    medium:
+                      type: integer
+                    high:
+                      type: integer
+            proximityRadius:
+              type: integer
+
+    AlternativeRouteRequest:
+      type: object
+      required:
+        - originalRoute
+        - avoidPoints
+      properties:
+        originalRoute:
+          type: object
+          properties:
+            path:
+              type: array
+              items:
+                type: array
+                items:
+                  type: number
+                  format: double
+        avoidPoints:
+          type: array
+          items:
+            type: object
+            properties:
+              latitude:
+                type: number
+                format: double
+              longitude:
+                type: number
+                format: double
+        proximityRadius:
+          type: integer
+          default: 1500
+
+    AlternativeRouteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            routes:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  summary:
+                    type: object
+                    properties:
+                      distance:
+                        type: integer
+                      duration:
+                        type: integer
+                      safetyScore:
+                        type: integer
+                  path:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: number
+                        format: double
+                  avoidedAreas:
+                    type: integer
+                  estimatedTime:
+                    type: string
+                  estimatedDistance:
+                    type: string
+            comparison:
+              type: object
+              properties:
+                originalDistance:
+                  type: integer
+                alternativeDistance:
+                  type: integer
+                additionalDistance:
+                  type: integer
+                additionalTime:
+                  type: integer
+                safetyImprovement:
+                  type: integer
+
+    AddressRequest:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          type: string
+          description: 변환할 주소
+
+    AddressResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            addresses:
+              type: array
+              items:
+                type: object
+                properties:
+                  roadAddress:
+                    type: string
+                  jibunAddress:
+                    type: string
+                  englishAddress:
+                    type: string
+                  coordinates:
+                    type: object
+                    properties:
+                      latitude:
+                        type: number
+                        format: double
+                      longitude:
+                        type: number
+                        format: double
+                  distance:
+                    type: number
+                    format: double
+            meta:
+              type: object
+              properties:
+                totalCount:
+                  type: integer
+                page:
+                  type: integer
+                count:
+                  type: integer
+
+    ReverseGeocodeRequest:
+      type: object
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+
+    ReverseGeocodeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            address:
+              type: string
+            roadAddress:
+              type: string
+            region:
+              type: object
+              properties:
+                area1:
+                  type: string
+                area2:
+                  type: string
+                area3:
+                  type: string
+
+    HealthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [healthy, unhealthy]
+            timestamp:
+              type: string
+              format: date-time
+            service:
+              type: string
+            version:
+              type: string
+            stage:
+              type: string
+            region:
+              type: string
+            uptime:
+              type: integer
+            memory:
+              type: object
+              properties:
+                used:
+                  type: integer
+                total:
+                  type: integer
+                limit:
+                  type: integer
+
+    SystemStatusResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [healthy, unhealthy]
+            timestamp:
+              type: string
+              format: date-time
+            components:
+              type: object
+              properties:
+                database:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    tables:
+                      type: object
+                      properties:
+                        total:
+                          type: integer
+                        healthy:
+                          type: integer
+                        unhealthy:
+                          type: integer
+                errorHandler:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    issues:
+                      type: array
+                      items:
+                        type: string
+                security:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                    stats:
+                      type: object
+                      properties:
+                        totalRequests:
+                          type: integer
+                        rateLimitedIPs:
+                          type: integer
+            system:
+              type: object
+              properties:
+                uptime:
+                  type: integer
+                memory:
+                  type: object
+                  properties:
+                    used:
+                      type: integer
+                    total:
+                      type: integer
+                    usage:
+                      type: integer
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            type:
+              type: string
+            requestId:
+              type: string
+            timestamp:
+              type: string
+              format: date-time
+            retryable:
+              type: boolean
+
+  responses:
+    BadRequest:
+      description: 잘못된 요청
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "VALIDATION_ERROR"
+              message: "Invalid request parameters"
+              type: "VALIDATION_ERROR"
+              requestId: "req-001"
+              timestamp: "2023-07-15T10:00:00Z"
+              retryable: false
+
+    Unauthorized:
+      description: 인증 실패
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "UNAUTHORIZED"
+              message: "Invalid or missing API key"
+              type: "AUTHENTICATION_ERROR"
+              requestId: "req-002"
+              timestamp: "2023-07-15T10:00:00Z"
+              retryable: false
+
+    NotFound:
+      description: 리소스를 찾을 수 없음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "NOT_FOUND"
+              message: "Resource not found"
+              type: "NOT_FOUND_ERROR"
+              requestId: "req-003"
+              timestamp: "2023-07-15T10:00:00Z"
+              retryable: false
+
+    RateLimitExceeded:
+      description: 요청 한도 초과
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "RATE_LIMIT_EXCEEDED"
+              message: "Rate limit exceeded. Try again in 60 seconds."
+              type: "RATE_LIMIT_ERROR"
+              requestId: "req-004"
+              timestamp: "2023-07-15T10:00:00Z"
+              retryable: true
+
+    InternalError:
+      description: 내부 서버 오류
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "INTERNAL_ERROR"
+              message: "Internal server error"
+              type: "INTERNAL_ERROR"
+              requestId: "req-005"
+              timestamp: "2023-07-15T10:00:00Z"
+              retryable: true
+
+    ServiceUnavailable:
+      description: 서비스 일시 중단
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "SERVICE_UNAVAILABLE"
+              message: "Service temporarily unavailable"
+              type: "SERVICE_ERROR"
+              requestId: "req-006"
+              timestamp: "2023-07-15T10:00:00Z"
+              retryable: true
+
+    NaverAPIError:
+      description: 네이버 API 오류
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: "NAVER_API_ERROR"
+              message: "Naver API temporarily unavailable"
+              type: "EXTERNAL_API_ERROR"
+              requestId: "req-007"
+              timestamp: "2023-07-15T10:00:00Z"
+              retryable: true
+
+tags:
+  - name: 홍수 데이터
+    description: 홍수 정보 조회 및 관리
+  - name: 데이터 관리
+    description: 데이터 갱신 및 상태 관리
+  - name: 네이버 지도
+    description: 경로 계산 및 안전성 검사
+  - name: 지오코딩
+    description: 주소-좌표 변환
+  - name: 시스템
+    description: 시스템 상태 및 헬스 체크
+
+externalDocs:
+  description: 상세 API 문서
+  url: https://docs.flood-info.example.com

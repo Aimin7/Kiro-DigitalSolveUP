@@ -1,0 +1,114 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CloudFront distribution for flood info frontend",
+  "Parameters": {
+    "S3BucketName": {
+      "Type": "String",
+      "Default": "flood-info-frontend-dev",
+      "Description": "S3 bucket name for the frontend"
+    }
+  },
+  "Resources": {
+    "CloudFrontOriginAccessIdentity": {
+      "Type": "AWS::CloudFront::OriginAccessIdentity",
+      "Properties": {
+        "OriginAccessIdentityConfig": {
+          "Comment": "OAI for flood info frontend"
+        }
+      }
+    },
+    "CloudFrontDistribution": {
+      "Type": "AWS::CloudFront::Distribution",
+      "Properties": {
+        "DistributionConfig": {
+          "Origins": [
+            {
+              "Id": "S3Origin",
+              "DomainName": {
+                "Fn::Sub": "${S3BucketName}.s3.ap-northeast-2.amazonaws.com"
+              },
+              "S3OriginConfig": {
+                "OriginAccessIdentity": {
+                  "Fn::Sub": "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
+                }
+              }
+            }
+          ],
+          "Enabled": true,
+          "DefaultRootObject": "index.html",
+          "DefaultCacheBehavior": {
+            "TargetOriginId": "S3Origin",
+            "ViewerProtocolPolicy": "redirect-to-https",
+            "AllowedMethods": ["GET", "HEAD", "OPTIONS"],
+            "CachedMethods": ["GET", "HEAD"],
+            "ForwardedValues": {
+              "QueryString": false,
+              "Cookies": {
+                "Forward": "none"
+              }
+            },
+            "MinTTL": 0,
+            "DefaultTTL": 86400,
+            "MaxTTL": 31536000,
+            "Compress": true
+          },
+          "CustomErrorResponses": [
+            {
+              "ErrorCode": 404,
+              "ResponseCode": 200,
+              "ResponsePagePath": "/index.html"
+            },
+            {
+              "ErrorCode": 403,
+              "ResponseCode": 200,
+              "ResponsePagePath": "/index.html"
+            }
+          ],
+          "PriceClass": "PriceClass_100",
+          "ViewerCertificate": {
+            "CloudFrontDefaultCertificate": true
+          }
+        }
+      }
+    },
+    "S3BucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "S3BucketName"
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Sid": "AllowCloudFrontAccess",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Sub": "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}"
+                }
+              },
+              "Action": "s3:GetObject",
+              "Resource": {
+                "Fn::Sub": "arn:aws:s3:::${S3BucketName}/*"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "CloudFrontDomainName": {
+      "Description": "CloudFront distribution domain name",
+      "Value": {
+        "Fn::GetAtt": ["CloudFrontDistribution", "DomainName"]
+      }
+    },
+    "CloudFrontDistributionId": {
+      "Description": "CloudFront distribution ID",
+      "Value": {
+        "Ref": "CloudFrontDistribution"
+      }
+    }
+  }
+}

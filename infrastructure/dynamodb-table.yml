@@ -1,0 +1,139 @@
+# DynamoDB 테이블 정의
+# AWS CloudFormation 템플릿
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'DynamoDB tables for Flood Info App'
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prod
+    Description: Deployment stage
+
+  TableName:
+    Type: String
+    Default: flood-info-table
+    Description: Base name for DynamoDB table
+
+Resources:
+  # 침수 정보 메인 테이블
+  FloodDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${TableName}-${Stage}'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: locationId
+          AttributeType: S
+        - AttributeName: apiType
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+        - AttributeName: status
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        # 위치별 조회 인덱스
+        - IndexName: LocationIndex
+          KeySchema:
+            - AttributeName: locationId
+              KeyType: HASH
+            - AttributeName: timestamp
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        # API 타입별 조회 인덱스
+        - IndexName: APITypeIndex
+          KeySchema:
+            - AttributeName: apiType
+              KeyType: HASH
+            - AttributeName: timestamp
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        # 상태별 조회 인덱스
+        - IndexName: StatusIndex
+          KeySchema:
+            - AttributeName: status
+              KeyType: HASH
+            - AttributeName: timestamp
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: Project
+          Value: FloodInfoApp
+        - Key: Stage
+          Value: !Ref Stage
+        - Key: Component
+          Value: Database
+
+  # API 소스 관리 테이블
+  APISourceTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${TableName}-api-sources-${Stage}'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: apiType
+          AttributeType: S
+        - AttributeName: lastUpdated
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        # API 타입별 조회 인덱스
+        - IndexName: APITypeIndex
+          KeySchema:
+            - AttributeName: apiType
+              KeyType: HASH
+            - AttributeName: lastUpdated
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      Tags:
+        - Key: Project
+          Value: FloodInfoApp
+        - Key: Stage
+          Value: !Ref Stage
+        - Key: Component
+          Value: APIManagement
+
+Outputs:
+  FloodDataTableName:
+    Description: Name of the flood data table
+    Value: !Ref FloodDataTable
+    Export:
+      Name: !Sub '${AWS::StackName}-FloodDataTable'
+
+  FloodDataTableArn:
+    Description: ARN of the flood data table
+    Value: !GetAtt FloodDataTable.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-FloodDataTableArn'
+
+  APISourceTableName:
+    Description: Name of the API source table
+    Value: !Ref APISourceTable
+    Export:
+      Name: !Sub '${AWS::StackName}-APISourceTable'
+
+  APISourceTableArn:
+    Description: ARN of the API source table
+    Value: !GetAtt APISourceTable.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-APISourceTableArn'

@@ -1,0 +1,375 @@
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+}
+
+.naver-map {
+  width: 100%;
+  height: 100%;
+}
+
+.map-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(248, 249, 250, 0.95);
+  z-index: 1000;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.map-loading p {
+  color: #6c757d;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.map-error {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(248, 249, 250, 0.95);
+  padding: 2rem;
+  z-index: 1000;
+}
+
+.map-error h3 {
+  color: #dc3545;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.map-error p {
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.map-error button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.map-error button:hover {
+  background-color: #0056b3;
+}
+
+.map-controls {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1000;
+}
+
+.control-button {
+  width: 48px;
+  height: 48px;
+  background-color: white;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+}
+
+.control-button:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transform: translateY(-1px);
+}
+
+.control-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 사용자 위치 마커 */
+.user-location-marker {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  --marker-color: #2196F3;
+}
+
+.user-location-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  background-color: var(--marker-color);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: #fff;
+}
+
+.user-location-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  background-color: var(--marker-color);
+  opacity: 0.3;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 2s infinite;
+  z-index: 1;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* 홍수 마커 */
+.flood-marker {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.flood-marker:hover {
+  transform: scale(1.1);
+}
+
+.flood-marker-inner {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* 홍수 정보 창 */
+.flood-info-window {
+  padding: 0;
+  min-width: 250px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.flood-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+}
+
+.flood-info-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.severity-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.severity-low {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.severity-medium {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.severity-high {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.flood-info-body {
+  padding: 12px 16px;
+}
+
+.flood-info-body p {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #495057;
+}
+
+.flood-info-body p:last-child {
+  margin-bottom: 0;
+}
+
+.flood-info-body strong {
+  color: #212529;
+  font-weight: 600;
+}
+
+.flood-info-actions {
+  padding: 12px 16px;
+  border-top: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+}
+
+.info-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.info-button:hover {
+  background-color: #0056b3;
+}
+
+/* 새로고침 오버레이 */
+.map-refresh-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(2px);
+}
+
+.refresh-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+.map-refresh-overlay span {
+  color: #495057;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 컨트롤 버튼 비활성화 상태 */
+.control-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+}
+
+.control-button:disabled:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transform: none;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .map-controls {
+    bottom: 0.75rem;
+    right: 0.75rem;
+  }
+  
+  .control-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .map-error {
+    padding: 1rem;
+  }
+  
+  .map-error h3 {
+    font-size: 1.125rem;
+  }
+
+  .flood-info-window {
+    min-width: 200px;
+  }
+
+  .flood-info-header h4 {
+    font-size: 14px;
+  }
+
+  .flood-info-body p {
+    font-size: 12px;
+  }
+
+  .flood-marker {
+    width: 24px;
+    height: 24px;
+  }
+
+  .flood-marker-inner {
+    font-size: 12px;
+  }
+}
