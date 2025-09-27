@@ -57,7 +57,7 @@ npm install
 
 ```env
 NAVER_CLIENT_ID=your_naver_client_id
-NAVER_CLIENT_SECRET=your_naver_client_secret
+NAVER_CLIENT_SECRET=YOUR_NAVER_CLIENT_SECRET_HERE
 ```
 
 ### 3. 로컬 개발 서버 실행

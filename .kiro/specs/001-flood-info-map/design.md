@@ -52,9 +52,9 @@ Data Integration Service
 - **NaverDirectionsService**: 네이버 Directions API 연동 및 우회 경로 계산
 
 ### 외부 API 연동
-- **한강홍수통제소 수위 관측소**: `http://211.188.52.85:9191/waterlevelinfo/info.json`
-- **한강홍수통제소 실시간 수위**: `http://211.188.52.85:9191/getWaterLevel1D/list/1D/1018683/20230701/20230930.json`
-- **한강홍수통제소 홍수예보발령**: `http://211.188.52.85:9191/fldfct/list/20230715.json`
+- **한강홍수통제소 수위 관측소**: 관측소 위치 및 기본 정보 조회
+- **한강홍수통제소 실시간 수위**: 관측소별 실시간 수위 변화 확인
+- **한강홍수통제소 홍수예보발령**: 지역별 홍수 특보 발령 현황 조회
 - **네이버 Web Dynamic Map**: 지도 표시 및 마커 관리
 - **네이버 Directions 5**: 안전 경로 안내
 - **네이버 Geocoding**: 주소-좌표 변환
@@ -193,8 +193,8 @@ Data Integration Service
 ### 환경 변수 설정 (Lambda 환경 변수)
 ```
 # 네이버 API 키
-NAVER_CLIENT_ID=nzitgym21s
-NAVER_CLIENT_SECRET=NtB7HWEKYT66vIFdXwv2HcRoFulNQ8wwvLapaIHI
+NAVER_CLIENT_ID=YOUR_NAVER_CLIENT_ID_HERE
+NAVER_CLIENT_SECRET=YOUR_NAVER_CLIENT_SECRET_HERE
 
 # 한강홍수통제소 API
 HANRIVER_BASE_URL=http://211.188.52.85:9191

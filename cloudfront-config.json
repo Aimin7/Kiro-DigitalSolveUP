@@ -5,7 +5,7 @@
     "Items": [
       {
         "Id": "S3Origin",
-        "DomainName": "flood-info-frontend-dev.s3-website.ap-northeast-2.amazonaws.com",
+        "DomainName": "YOUR-S3-BUCKET-NAME.s3-website.YOUR-REGION.amazonaws.com",
         "CustomOriginConfig": {
           "HTTPPort": 80,
           "HTTPSPort": 443,

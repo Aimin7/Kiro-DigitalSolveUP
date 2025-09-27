@@ -42,7 +42,7 @@ npm install -g serverless
 
 # 3. 환경 변수 설정
 export NAVER_CLIENT_ID="your_client_id"
-export NAVER_CLIENT_SECRET="your_client_secret"
+export NAVER_CLIENT_SECRET="YOUR_NAVER_CLIENT_SECRET_HERE"
 export ALLOWED_ORIGINS="https://yourdomain.com"
 ```
 
@@ -382,11 +382,10 @@ jobs:
 4. **이슈 리포트**: GitHub Issues에 문제 상황 상세히 기록
 
 ### 연락처
-- **이메일**: support@flood-info.example.com
-- **GitHub**: https://github.com/flood-info/issues
-- **문서**: https://docs.flood-info.example.com
+- **이메일**: support@cccr.or.kr
+- **GitHub**: https://github.com/Aimin7/Kiro-DigitalSolveUP
 
 ---
 
-**마지막 업데이트**: 2024년 1월 15일  
-**앱 버전**: 1.2.0
+**마지막 업데이트**: 2025년 9월 27일  
+**앱 버전**: 1.0.0

@@ -23,12 +23,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Aimin7/flood-info-display-app.git"
+    "url": "https://github.com/Aimin7/Kiro-DigitalSolveUP.git"
   },
   "bugs": {
-    "url": "https://github.com/Aimin7/flood-info-display-app/issues"
+    "url": "https://github.com/Aimin7/Kiro-DigitalSolveUP/issues"
   },
-  "homepage": "https://github.com/Aimin7/flood-info-display-app#readme",
+  "homepage": "https://github.com/Aimin7/Kiro-DigitalSolveUP#readme",
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5"

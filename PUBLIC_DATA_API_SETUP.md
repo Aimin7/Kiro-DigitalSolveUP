@@ -2,13 +2,14 @@
 
 이 문서는 침수 정보 표시 앱에서 공공 데이터 API를 사용하기 위한 설정 가이드입니다.
 
-## 🏛️ 민관협력지원플랫폼 API 설정
+## 🏛️ 민관협력 지원 플랫폼 API 설정
 
-### 1. 민관협력지원플랫폼 회원가입
+### 1. 민관협력 지원 플랫폼 회원가입
 
-1. [민관협력지원플랫폼](https://www.data.go.kr/)에 접속
+1. [민관협력 지원 플랫폼](https://digitalsolveup.kr/)에 접속
 2. 회원가입 및 로그인
-3. 본인인증 완료
+3. 메인화면 우측 상단의 '사용 신청'을 통해 신청서 작성 및 제출
+4. 사용 신청 승인 안내 문자를 수신 후 사용
 
 ### 2. 필요한 API 신청
 
@@ -33,13 +34,8 @@
 각 API별로 다음 단계를 수행하세요:
 
 1. **API 검색 및 선택**
-2. **활용신청** 클릭
-3. **신청 정보 입력**:
-   - 활용목적: `홍수 정보 제공 웹 서비스`
-   - 활용분야: `재해/재난`
-   - 서비스명: `침수 정보 표시 앱`
-4. **승인 대기** (보통 1-3일)
-5. **API 키 발급 확인**
+2. **신청하기** 클릭
+3. **콘솔에서 API 발급 정보 확인**
 
 ## 🔑 환경 변수 설정
 
@@ -57,8 +53,6 @@ VITE_HANRIVER_API_KEY=YOUR_HANRIVER_API_KEY_HERE
 # 행정안전부 API
 VITE_MOIS_API_KEY=YOUR_MOIS_API_KEY_HERE
 
-# 민관협력지원플랫폼 공통 API 키
-VITE_PUBLIC_DATA_API_KEY=YOUR_PUBLIC_DATA_API_KEY_HERE
 ```
 
 ## 📊 주요 API 사용법
@@ -455,14 +449,14 @@ const trackApiError = (apiName, error) => {
 
 공공 데이터 API 관련 문제가 발생하면:
 
-1. [민관협력지원플랫폼 고객센터](https://www.data.go.kr/tcs/main.do)
-2. 각 기관별 API 문의처
-3. 민관협력지원플랫폼 Q&A 게시판
-4. 프로젝트 이슈 생성
+1. 각 기관별 API 문의처
+2. [민관협력 지원 플랫폼 운영 사무국 이메일 문의](support@cccr.or.kr)
+3. 프로젝트 이슈 생성
 
 ## 📚 참고 자료
 
-- [민관협력지원플랫폼](https://www.data.go.kr/)
+- [민관협력 지원 플랫폼](https://digitalsolveup.kr/)
+- [공공 데이터 포털](https://www.data.go.kr/)
 - [기상청 API 가이드](https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15084084)
 - [한강홍수통제소 API](https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15077586)
 - [행정안전부 API](https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15000895)

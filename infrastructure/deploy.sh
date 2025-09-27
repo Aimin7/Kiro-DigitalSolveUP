@@ -204,7 +204,7 @@ REGION=${REGION}
 
 # API Keys (Please update these)
 NAVER_CLIENT_ID=your_naver_client_id
-NAVER_CLIENT_SECRET=your_naver_client_secret
+NAVER_CLIENT_SECRET=YOUR_NAVER_CLIENT_SECRET_HERE
 
 # Security Settings
 ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
