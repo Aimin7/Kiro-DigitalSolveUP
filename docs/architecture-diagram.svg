@@ -22,7 +22,7 @@
   </defs>
 
   <!-- Title -->
-  <text x="600" y="30" text-anchor="middle" class="title">KIRO 홍수 정보 시스템 - 서비스 구성도</text>
+  <text x="600" y="30" text-anchor="middle" class="title">침수 정보 표시 앱 - 서비스 구성도</text>
   
   <!-- User Layer -->
   <rect x="50" y="60" width="200" height="80" class="user-box"/>
