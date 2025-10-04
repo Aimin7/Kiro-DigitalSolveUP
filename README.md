@@ -10,7 +10,7 @@
 ## 🏗️ 시스템 구성도
 
 ### 전체 시스템 아키텍처
-![침수 정보 표시 앱 구성도](docs/architecture-diagram.svg)
+![침수 정보 표시 앱 구성도](docs/AWS_ARCHITECTURE.JPG)
 
 ### 시스템 구성 요소
 
